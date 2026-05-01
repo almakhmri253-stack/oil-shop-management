@@ -116,11 +116,12 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .HasForeignKey(sri => sri.ProductId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        var seedDate = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         builder.Entity<Category>().HasData(
-            new Category { Id = 1, Name = "زيت محرك", Description = "جميع أنواع زيوت المحرك", IsActive = true, CreatedAt = new DateTime(2024, 1, 1) },
-            new Category { Id = 2, Name = "زيت قير", Description = "زيوت ناقل الحركة", IsActive = true, CreatedAt = new DateTime(2024, 1, 1) },
-            new Category { Id = 3, Name = "فلاتر", Description = "فلاتر الزيت والهواء", IsActive = true, CreatedAt = new DateTime(2024, 1, 1) },
-            new Category { Id = 4, Name = "إضافات", Description = "إضافات ومواد تشحيم", IsActive = true, CreatedAt = new DateTime(2024, 1, 1) }
+            new Category { Id = 1, Name = "زيت محرك", Description = "جميع أنواع زيوت المحرك", IsActive = true, CreatedAt = seedDate },
+            new Category { Id = 2, Name = "زيت قير", Description = "زيوت ناقل الحركة", IsActive = true, CreatedAt = seedDate },
+            new Category { Id = 3, Name = "فلاتر", Description = "فلاتر الزيت والهواء", IsActive = true, CreatedAt = seedDate },
+            new Category { Id = 4, Name = "إضافات", Description = "إضافات ومواد تشحيم", IsActive = true, CreatedAt = seedDate }
         );
     }
 }

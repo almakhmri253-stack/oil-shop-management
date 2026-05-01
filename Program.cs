@@ -10,8 +10,6 @@ using OilShopManagement.Services;
 using Serilog;
 using System.Globalization;
 
-AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .WriteTo.File("logs/oilshop-.log", rollingInterval: RollingInterval.Day)

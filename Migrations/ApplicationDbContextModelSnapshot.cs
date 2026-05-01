@@ -267,7 +267,7 @@ namespace OilShopManagement.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "جميع أنواع زيوت المحرك",
                             IsActive = true,
                             Name = "زيت محرك"
@@ -275,7 +275,7 @@ namespace OilShopManagement.Migrations
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "زيوت ناقل الحركة",
                             IsActive = true,
                             Name = "زيت قير"
@@ -283,7 +283,7 @@ namespace OilShopManagement.Migrations
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "فلاتر الزيت والهواء",
                             IsActive = true,
                             Name = "فلاتر"
@@ -291,7 +291,7 @@ namespace OilShopManagement.Migrations
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "إضافات ومواد تشحيم",
                             IsActive = true,
                             Name = "إضافات"

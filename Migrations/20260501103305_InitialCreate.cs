@@ -535,10 +535,10 @@ namespace OilShopManagement.Migrations
                 columns: new[] { "Id", "CreatedAt", "Description", "IsActive", "Name" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "جميع أنواع زيوت المحرك", true, "زيت محرك" },
-                    { 2, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "زيوت ناقل الحركة", true, "زيت قير" },
-                    { 3, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "فلاتر الزيت والهواء", true, "فلاتر" },
-                    { 4, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "إضافات ومواد تشحيم", true, "إضافات" }
+                    { 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "جميع أنواع زيوت المحرك", true, "زيت محرك" },
+                    { 2, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "زيوت ناقل الحركة", true, "زيت قير" },
+                    { 3, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "فلاتر الزيت والهواء", true, "فلاتر" },
+                    { 4, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "إضافات ومواد تشحيم", true, "إضافات" }
                 });
 
             migrationBuilder.CreateIndex(
