@@ -1,13 +1,13 @@
 @model OilShopManagement.Models.SaleReturn
 @{
-    ViewData["Title"] = "تفاصيل مرتجع المبيعات";
+    ViewData["Title"] = L.T("تفاصيل مرتجع المبيعات","Sale Return Details");
 }
 
 <div class="d-flex align-items-center justify-content-between mb-4">
-    <h4 class="fw-bold mb-0">مرتجع: <span class="text-warning">@Model.ReturnNumber</span></h4>
+    <h4 class="fw-bold mb-0">@L.T("مرتجع:","Return:") <span class="text-warning">@Model.ReturnNumber</span></h4>
     <div class="d-flex gap-2">
         <a href="/SaleReturns" class="btn btn-outline-secondary rounded-pill btn-sm">
-            <i class="bi bi-arrow-right me-1"></i>العودة
+            <i class="bi bi-arrow-right me-1"></i>@L.T("العودة","Back")
         </a>
     </div>
 </div>
@@ -15,16 +15,16 @@
 <div class="row g-3">
     <div class="col-md-8">
         <div class="card">
-            <div class="card-header fw-bold">المنتجات المرتجعة</div>
+            <div class="card-header fw-bold">@L.T("المنتجات المرتجعة","Returned Products")</div>
             <div class="card-body p-0">
                 <div class="table-responsive">
                 <table class="table mb-0">
                     <thead>
                         <tr>
-                            <th>المنتج</th>
-                            <th class="text-center">الكمية</th>
-                            <th class="text-end">سعر الوحدة</th>
-                            <th class="text-end">الإجمالي</th>
+                            <th>@L.T("المنتج","Product")</th>
+                            <th class="text-center">@L.T("الكمية","Qty")</th>
+                            <th class="text-end">@L.T("سعر الوحدة","Unit Price")</th>
+                            <th class="text-end">@L.T("الإجمالي","Total")</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -40,7 +40,7 @@
                     </tbody>
                     <tfoot class="table-light">
                         <tr class="table-warning">
-                            <td colspan="3" class="text-end fw-bold">الإجمالي</td>
+                            <td colspan="3" class="text-end fw-bold">@L.T("الإجمالي","Total")</td>
                             <td class="text-end fw-bold fs-5">@Model.TotalAmount.ToString("N3") ر.ع.</td>
                         </tr>
                     </tfoot>
@@ -51,12 +51,12 @@
     </div>
     <div class="col-md-4">
         <div class="card mb-3">
-            <div class="card-header fw-bold">معلومات المرتجع</div>
+            <div class="card-header fw-bold">@L.T("معلومات المرتجع","Return Info")</div>
             <div class="card-body">
                 <dl class="row mb-0 small">
-                    <dt class="col-5 text-muted">التاريخ</dt>
+                    <dt class="col-5 text-muted">@L.T("التاريخ","Date")</dt>
                     <dd class="col-7">@Model.ReturnDate.ToString("dd/MM/yyyy HH:mm")</dd>
-                    <dt class="col-5 text-muted">فاتورة البيع</dt>
+                    <dt class="col-5 text-muted">@L.T("فاتورة البيع","Sale Invoice")</dt>
                     <dd class="col-7">
                         @if (Model.Invoice != null)
                         { <a href="/Invoices/Details/@Model.Invoice.Id">@Model.Invoice.InvoiceNumber</a> }
@@ -64,7 +64,7 @@
                     </dd>
                     @if (!string.IsNullOrEmpty(Model.Reason))
                     {
-                        <dt class="col-5 text-muted">السبب</dt>
+                        <dt class="col-5 text-muted">@L.T("السبب","Reason")</dt>
                         <dd class="col-7">@Model.Reason</dd>
                     }
                 </dl>
@@ -73,7 +73,7 @@
         @if (Model.Customer != null)
         {
             <div class="card">
-                <div class="card-header fw-bold">بيانات العميل</div>
+                <div class="card-header fw-bold">@L.T("بيانات العميل","Customer Info")</div>
                 <div class="card-body small">
                     <div class="fw-semibold">@Model.Customer.Name</div>
                     @if (!string.IsNullOrEmpty(Model.Customer.Phone))

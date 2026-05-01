@@ -1,32 +1,32 @@
 @model OilShopManagement.Models.Purchase
 @{
-    ViewData["Title"] = $"تفاصيل فاتورة الشراء";
+    ViewData["Title"] = L.T("تفاصيل فاتورة الشراء","Purchase Invoice Details");
 }
 
 <div class="d-flex align-items-center justify-content-between mb-4">
-    <h4 class="fw-bold mb-0">فاتورة شراء: <span class="text-success">@Model.PurchaseNumber</span></h4>
+    <h4 class="fw-bold mb-0">@L.T("فاتورة شراء:","Purchase:") <span class="text-success">@Model.PurchaseNumber</span></h4>
     <div class="d-flex gap-2">
         <a href="/Purchases/Print/@Model.Id" target="_blank" class="btn btn-outline-success rounded-pill btn-sm">
-            <i class="bi bi-printer me-1"></i>طباعة
+            <i class="bi bi-printer me-1"></i>@L.T("طباعة","Print")
         </a>
         @if (Model.Status == OilShopManagement.Models.PurchaseStatus.Completed)
         {
             <a href="/PurchaseReturns/Create?purchaseId=@Model.Id" class="btn btn-outline-warning rounded-pill btn-sm">
-                <i class="bi bi-arrow-return-right me-1"></i>مرتجع
+                <i class="bi bi-arrow-return-right me-1"></i>@L.T("مرتجع","Return")
             </a>
         }
         @if (Model.Status == OilShopManagement.Models.PurchaseStatus.Completed && User.IsInRole("Admin"))
         {
             <form asp-action="Cancel" asp-route-id="@Model.Id" method="post"
-                onsubmit="return confirm('هل تريد إلغاء هذه الفاتورة وعكس المخزون؟')">
+                onsubmit="return confirm('@L.T("هل تريد إلغاء هذه الفاتورة وعكس المخزون؟","Cancel this invoice and reverse stock?")')">
                 @Html.AntiForgeryToken()
                 <button type="submit" class="btn btn-outline-danger rounded-pill btn-sm">
-                    <i class="bi bi-x-circle me-1"></i>إلغاء الفاتورة
+                    <i class="bi bi-x-circle me-1"></i>@L.T("إلغاء الفاتورة","Cancel Invoice")
                 </button>
             </form>
         }
         <a href="/Purchases" class="btn btn-outline-secondary rounded-pill btn-sm">
-            <i class="bi bi-arrow-right me-1"></i>العودة
+            <i class="bi bi-arrow-right me-1"></i>@L.T("العودة","Back")
         </a>
     </div>
 </div>
@@ -34,16 +34,16 @@
 <div class="row g-3">
     <div class="col-md-8">
         <div class="card">
-            <div class="card-header fw-bold">المنتجات</div>
+            <div class="card-header fw-bold">@L.T("المنتجات","Products")</div>
             <div class="card-body p-0">
                 <div class="table-responsive">
                 <table class="table mb-0">
                     <thead>
                         <tr>
-                            <th>المنتج</th>
-                            <th class="text-center">الكمية</th>
-                            <th class="text-end">سعر الوحدة</th>
-                            <th class="text-end">الإجمالي</th>
+                            <th>@L.T("المنتج","Product")</th>
+                            <th class="text-center">@L.T("الكمية","Qty")</th>
+                            <th class="text-end">@L.T("سعر الوحدة","Unit Price")</th>
+                            <th class="text-end">@L.T("الإجمالي","Total")</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -59,26 +59,26 @@
                     </tbody>
                     <tfoot class="table-light">
                         <tr>
-                            <td colspan="3" class="text-end fw-semibold">الإجمالي قبل الضريبة</td>
+                            <td colspan="3" class="text-end fw-semibold">@L.T("الإجمالي قبل الضريبة","Subtotal")</td>
                             <td class="text-end fw-semibold">@Model.SubTotal.ToString("N3")</td>
                         </tr>
                         @if (Model.TaxRate > 0)
                         {
                             <tr>
-                                <td colspan="3" class="text-end fw-semibold">الضريبة (@Model.TaxRate%)</td>
+                                <td colspan="3" class="text-end fw-semibold">@L.T("الضريبة","Tax") (@Model.TaxRate%)</td>
                                 <td class="text-end fw-semibold">@Model.TaxAmount.ToString("N3")</td>
                             </tr>
                         }
                         @if (Model.Discount > 0)
                         {
                             <tr>
-                                <td colspan="3" class="text-end fw-semibold text-success">خصم</td>
+                                <td colspan="3" class="text-end fw-semibold text-success">@L.T("خصم","Discount")</td>
                                 <td class="text-end fw-semibold text-success">-@Model.Discount.ToString("N3")</td>
                             </tr>
                         }
                         <tr class="table-success">
-                            <td colspan="3" class="text-end fw-bold">الإجمالي النهائي</td>
-                            <td class="text-end fw-bold fs-5">@Model.TotalAmount.ToString("N3") ر.ع.</td>
+                            <td colspan="3" class="text-end fw-bold">@L.T("الإجمالي النهائي","Grand Total")</td>
+                            <td class="text-end fw-bold fs-5">@Model.TotalAmount.ToString("N3") @L.T("ر.ع.","OMR")</td>
                         </tr>
                     </tfoot>
                 </table>
@@ -88,28 +88,28 @@
     </div>
     <div class="col-md-4">
         <div class="card mb-3">
-            <div class="card-header fw-bold">معلومات الفاتورة</div>
+            <div class="card-header fw-bold">@L.T("معلومات الفاتورة","Invoice Info")</div>
             <div class="card-body">
                 <dl class="row mb-0 small">
-                    <dt class="col-5 text-muted">الحالة</dt>
+                    <dt class="col-5 text-muted">@L.T("الحالة","Status")</dt>
                     <dd class="col-7">
                         @if (Model.Status == OilShopManagement.Models.PurchaseStatus.Completed)
-                        { <span class="badge bg-success">مكتملة</span> }
+                        { <span class="badge bg-success">@L.T("مكتملة","Completed")</span> }
                         else if (Model.Status == OilShopManagement.Models.PurchaseStatus.Cancelled)
-                        { <span class="badge bg-danger">ملغاة</span> }
-                        else { <span class="badge bg-secondary">مسودة</span> }
+                        { <span class="badge bg-danger">@L.T("ملغاة","Cancelled")</span> }
+                        else { <span class="badge bg-secondary">@L.T("مسودة","Draft")</span> }
                     </dd>
-                    <dt class="col-5 text-muted">التاريخ</dt>
+                    <dt class="col-5 text-muted">@L.T("التاريخ","Date")</dt>
                     <dd class="col-7">@Model.PurchaseDate.ToString("dd/MM/yyyy HH:mm")</dd>
-                    <dt class="col-5 text-muted">الدفع</dt>
+                    <dt class="col-5 text-muted">@L.T("الدفع","Payment")</dt>
                     <dd class="col-7">
-                        @if (Model.PaymentMethod == OilShopManagement.Models.PaymentMethod.Cash) { <text>نقداً</text> }
-                        else if (Model.PaymentMethod == OilShopManagement.Models.PaymentMethod.Card) { <text>بطاقة</text> }
-                        else { <text>تحويل</text> }
+                        @if (Model.PaymentMethod == OilShopManagement.Models.PaymentMethod.Cash) { @L.T("نقداً","Cash") }
+                        else if (Model.PaymentMethod == OilShopManagement.Models.PaymentMethod.Card) { @L.T("بطاقة","Card") }
+                        else { @L.T("تحويل","Transfer") }
                     </dd>
                     @if (!string.IsNullOrEmpty(Model.Notes))
                     {
-                        <dt class="col-5 text-muted">ملاحظات</dt>
+                        <dt class="col-5 text-muted">@L.T("ملاحظات","Notes")</dt>
                         <dd class="col-7">@Model.Notes</dd>
                     }
                 </dl>
@@ -118,7 +118,7 @@
         @if (Model.Supplier != null)
         {
             <div class="card">
-                <div class="card-header fw-bold">بيانات المورد</div>
+                <div class="card-header fw-bold">@L.T("بيانات المورد","Supplier Info")</div>
                 <div class="card-body small">
                     <div class="fw-semibold">@Model.Supplier.Name</div>
                     @if (!string.IsNullOrEmpty(Model.Supplier.Phone))

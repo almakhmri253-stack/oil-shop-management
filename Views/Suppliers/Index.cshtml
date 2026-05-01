@@ -1,12 +1,12 @@
 @model IEnumerable<OilShopManagement.Models.Supplier>
 @{
-    ViewData["Title"] = "الموردون";
+    ViewData["Title"] = L.T("الموردون","Suppliers");
 }
 
 <div class="d-flex align-items-center justify-content-between mb-3">
-    <h4 class="fw-bold mb-0"><i class="bi bi-truck me-2 text-primary"></i>الموردون</h4>
+    <h4 class="fw-bold mb-0"><i class="bi bi-truck me-2 text-primary"></i>@L.T("الموردون","Suppliers")</h4>
     <a href="/Suppliers/Create" class="btn btn-primary rounded-pill btn-sm">
-        <i class="bi bi-plus-lg me-1"></i>مورد جديد
+        <i class="bi bi-plus-lg me-1"></i>@L.T("مورد جديد","New Supplier")
     </a>
 </div>
 
@@ -14,11 +14,11 @@
     <div class="card-body py-2">
         <form method="get" class="d-flex gap-2">
             <input type="text" name="search" value="@ViewBag.Search" class="form-control form-control-sm"
-                placeholder="ابحث باسم المورد أو الهاتف...">
-            <button class="btn btn-outline-primary btn-sm px-3">بحث</button>
+                placeholder="@L.T("ابحث باسم المورد أو الهاتف...","Search by name or phone...")">
+            <button class="btn btn-outline-primary btn-sm px-3">@L.T("بحث","Search")</button>
             @if (!string.IsNullOrEmpty(ViewBag.Search as string))
             {
-                <a href="/Suppliers" class="btn btn-outline-secondary btn-sm">مسح</a>
+                <a href="/Suppliers" class="btn btn-outline-secondary btn-sm">@L.T("مسح","Clear")</a>
             }
         </form>
     </div>
@@ -30,11 +30,11 @@
             <table class="table table-hover mb-0">
                 <thead>
                     <tr>
-                        <th>اسم المورد</th>
-                        <th>الهاتف</th>
-                        <th>جهة الاتصال</th>
-                        <th>البريد الإلكتروني</th>
-                        <th>تاريخ الإضافة</th>
+                        <th>@L.T("اسم المورد","Supplier Name")</th>
+                        <th>@L.T("الهاتف","Phone")</th>
+                        <th>@L.T("جهة الاتصال","Contact Person")</th>
+                        <th>@L.T("البريد الإلكتروني","Email")</th>
+                        <th>@L.T("تاريخ الإضافة","Added On")</th>
                         <th style="width:120px"></th>
                     </tr>
                 </thead>
@@ -53,7 +53,7 @@
                                         <i class="bi bi-pencil"></i>
                                     </a>
                                     <form method="post" action="/Suppliers/Delete/@s.Id"
-                                        onsubmit="return confirm('حذف المورد @s.Name؟')">
+                                        onsubmit="return confirm('@L.T("حذف المورد","Delete supplier") @s.Name؟')">
                                         @Html.AntiForgeryToken()
                                         <button class="btn btn-sm btn-outline-danger">
                                             <i class="bi bi-trash3"></i>
@@ -67,7 +67,7 @@
                     {
                         <tr>
                             <td colspan="6" class="text-center text-muted py-5">
-                                <i class="bi bi-truck fs-2 d-block mb-2"></i>لا يوجد موردون
+                                <i class="bi bi-truck fs-2 d-block mb-2"></i>@L.T("لا يوجد موردون","No suppliers found")
                             </td>
                         </tr>
                     }

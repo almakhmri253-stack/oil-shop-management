@@ -1,6 +1,6 @@
 @model OilShopManagement.Models.Customer
 @{
-    ViewData["Title"] = "تفاصيل العميل";
+    ViewData["Title"] = L.T("تفاصيل العميل","Customer Details");
 }
 
 <div class="d-flex align-items-center gap-3 mb-4">
@@ -13,7 +13,7 @@
 <div class="row g-3">
     <div class="col-md-4">
         <div class="card">
-            <div class="card-header fw-bold">بيانات العميل</div>
+            <div class="card-header fw-bold">@L.T("بيانات العميل","Customer Info")</div>
             <div class="card-body">
                 <div class="text-center mb-3">
                     <div class="rounded-circle bg-primary bg-opacity-10 d-inline-flex align-items-center justify-content-center" style="width:72px;height:72px">
@@ -24,33 +24,33 @@
                 <dl class="row small mb-0">
                     @if (!string.IsNullOrEmpty(Model.Phone))
                     {
-                        <dt class="col-4 text-muted">الجوال</dt>
+                        <dt class="col-4 text-muted">@L.T("الجوال","Phone")</dt>
                         <dd class="col-8">@Model.Phone</dd>
                     }
                     @if (!string.IsNullOrEmpty(Model.Email))
                     {
-                        <dt class="col-4 text-muted">البريد</dt>
+                        <dt class="col-4 text-muted">@L.T("البريد","Email")</dt>
                         <dd class="col-8">@Model.Email</dd>
                     }
                     @if (!string.IsNullOrEmpty(Model.CarModel))
                     {
-                        <dt class="col-4 text-muted">السيارة</dt>
+                        <dt class="col-4 text-muted">@L.T("السيارة","Car")</dt>
                         <dd class="col-8">@Model.CarModel</dd>
                     }
                     @if (!string.IsNullOrEmpty(Model.PlateNumber))
                     {
-                        <dt class="col-4 text-muted">اللوحة</dt>
+                        <dt class="col-4 text-muted">@L.T("اللوحة","Plate")</dt>
                         <dd class="col-8 fw-bold">@Model.PlateNumber</dd>
                     }
-                    <dt class="col-4 text-muted">منذ</dt>
+                    <dt class="col-4 text-muted">@L.T("منذ","Since")</dt>
                     <dd class="col-8">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
                 </dl>
                 <div class="d-flex gap-2 mt-3">
                     <a href="/Customers/Edit/@Model.Id" class="btn btn-primary btn-sm rounded-pill flex-fill">
-                        <i class="bi bi-pencil me-1"></i>تعديل
+                        <i class="bi bi-pencil me-1"></i>@L.T("تعديل","Edit")
                     </a>
                     <a href="/Invoices/Create" class="btn btn-success btn-sm rounded-pill flex-fill">
-                        <i class="bi bi-plus me-1"></i>فاتورة
+                        <i class="bi bi-plus me-1"></i>@L.T("فاتورة","Invoice")
                     </a>
                 </div>
             </div>
@@ -58,16 +58,16 @@
     </div>
     <div class="col-md-8">
         <div class="card">
-            <div class="card-header fw-bold">آخر الفواتير</div>
+            <div class="card-header fw-bold">@L.T("آخر الفواتير","Recent Invoices")</div>
             <div class="card-body p-0">
                 <div class="table-responsive">
                 <table class="table table-hover mb-0">
                     <thead>
                         <tr>
-                            <th>رقم الفاتورة</th>
-                            <th>التاريخ</th>
-                            <th>الإجمالي</th>
-                            <th>الحالة</th>
+                            <th>@L.T("رقم الفاتورة","Invoice #")</th>
+                            <th>@L.T("التاريخ","Date")</th>
+                            <th>@L.T("الإجمالي","Total")</th>
+                            <th>@L.T("الحالة","Status")</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -79,15 +79,15 @@
                                 <td class="fw-semibold">@inv.TotalAmount.ToString("N3") ر.ع.</td>
                                 <td>
                                     @if (inv.Status == OilShopManagement.Models.InvoiceStatus.Completed)
-                                    { <span class="badge bg-success">مكتملة</span> }
+                                    { <span class="badge bg-success">@L.T("مكتملة","Completed")</span> }
                                     else
-                                    { <span class="badge bg-danger">ملغاة</span> }
+                                    { <span class="badge bg-danger">@L.T("ملغاة","Cancelled")</span> }
                                 </td>
                             </tr>
                         }
                         @if (!Model.Invoices.Any())
                         {
-                            <tr><td colspan="4" class="text-center text-muted py-4">لا توجد فواتير</td></tr>
+                            <tr><td colspan="4" class="text-center text-muted py-4">@L.T("لا توجد فواتير","No invoices")</td></tr>
                         }
                     </tbody>
                 </table>

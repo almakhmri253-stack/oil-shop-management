@@ -1,7 +1,7 @@
 @model List<OilShopManagement.Controllers.UserWithRolesViewModel>
 @using OilShopManagement.Authorization
 @{
-    ViewData["Title"] = "المستخدمون والصلاحيات";
+    ViewData["Title"] = L.T("المستخدمون والصلاحيات","Users & Permissions");
     var stats = ViewBag.Stats as OilShopManagement.Controllers.UserStatsViewModel;
     var roles = ViewBag.Roles as List<string> ?? new List<string>();
     var permGroups = ViewBag.PermissionGroups as IEnumerable<PermissionGroup> ?? [];
@@ -10,11 +10,11 @@
 
 <div class="d-flex align-items-center justify-content-between mb-4">
     <div>
-        <h4 class="fw-bold mb-0"><i class="bi bi-shield-lock me-2 text-primary"></i>المستخدمون والصلاحيات</h4>
-        <small class="text-muted">إدارة الحسابات وتخصيص الصلاحيات لكل مستخدم</small>
+        <h4 class="fw-bold mb-0"><i class="bi bi-shield-lock me-2 text-primary"></i>@L.T("المستخدمون والصلاحيات","Users & Permissions")</h4>
+        <small class="text-muted">@L.T("إدارة الحسابات وتخصيص الصلاحيات لكل مستخدم","Manage accounts and assign permissions")</small>
     </div>
     <button class="btn btn-primary rounded-pill px-4 shadow-sm" onclick="openAddModal()">
-        <i class="bi bi-person-plus-fill me-2"></i>مستخدم جديد
+        <i class="bi bi-person-plus-fill me-2"></i>@L.T("مستخدم جديد","New User")
     </button>
 </div>
 
@@ -22,10 +22,10 @@
 <div class="row g-3 mb-4">
     @{
         var cards = new[] {
-            ("إجمالي المستخدمين", stats?.Total ?? 0, "bi-people-fill", "primary"),
-            ("مديرو النظام",       stats?.Admins ?? 0,    "bi-shield-fill",   "danger"),
-            ("الموظفون",           stats?.Employees ?? 0, "bi-person-badge",  "info"),
-            ("الحسابات النشطة",   stats?.Active ?? 0,    "bi-check-circle-fill","success"),
+            (L.T("إجمالي المستخدمين","Total Users"), stats?.Total ?? 0,     "bi-people-fill",        "primary"),
+            (L.T("مديرو النظام","Admins"),            stats?.Admins ?? 0,    "bi-shield-fill",        "danger"),
+            (L.T("الموظفون","Employees"),             stats?.Employees ?? 0, "bi-person-badge",       "info"),
+            (L.T("الحسابات النشطة","Active Accounts"),stats?.Active ?? 0,    "bi-check-circle-fill",  "success"),
         };
     }
     @foreach (var (label, val, icon, color) in cards)
@@ -55,16 +55,16 @@
                 <div class="input-group input-group-sm">
                     <span class="input-group-text bg-transparent border-end-0"><i class="bi bi-search text-muted"></i></span>
                     <input type="text" name="search" class="form-control border-start-0 ps-0"
-                        placeholder="بحث بالاسم أو البريد..." value="@ViewBag.Search">
+                        placeholder="@L.T("بحث بالاسم أو البريد...","Search by name or email...")" value="@ViewBag.Search">
                 </div>
             </div>
             <div class="col-md-3">
                 <select name="roleFilter" class="form-select form-select-sm">
-                    <option value="">جميع الأدوار</option>
+                    <option value="">@L.T("جميع الأدوار","All Roles")</option>
                     @foreach (var r in roles)
                     {
                         var rl = ViewBag.RoleFilter == r;
-                        var lbl = r == "Admin" ? "مدير" : "موظف";
+                        var lbl = r == "Admin" ? L.T("مدير","Admin") : L.T("موظف","Employee");
                         if (rl) { <option value="@r" selected>@lbl</option> }
                         else    { <option value="@r">@lbl</option> }
                     }
@@ -72,16 +72,16 @@
             </div>
             <div class="col-md-2">
                 <select name="statusFilter" class="form-select form-select-sm">
-                    <option value="">جميع الحالات</option>
-                    @if (ViewBag.StatusFilter == "active")   { <option value="active" selected>نشط</option> }   else { <option value="active">نشط</option> }
-                    @if (ViewBag.StatusFilter == "inactive") { <option value="inactive" selected>معطل</option> } else { <option value="inactive">معطل</option> }
+                    <option value="">@L.T("جميع الحالات","All Statuses")</option>
+                    @if (ViewBag.StatusFilter == "active")   { <option value="active" selected>@L.T("نشط","Active")</option> }   else { <option value="active">@L.T("نشط","Active")</option> }
+                    @if (ViewBag.StatusFilter == "inactive") { <option value="inactive" selected>@L.T("معطل","Inactive")</option> } else { <option value="inactive">@L.T("معطل","Inactive")</option> }
                 </select>
             </div>
             <div class="col-md-2 d-flex gap-1">
                 <button type="submit" class="btn btn-primary btn-sm flex-fill rounded-pill">
-                    <i class="bi bi-funnel me-1"></i>تصفية
+                    <i class="bi bi-funnel me-1"></i>@L.T("تصفية","Filter")
                 </button>
-                <a href="/Users" class="btn btn-outline-secondary btn-sm rounded-pill px-2" title="مسح">
+                <a href="/Users" class="btn btn-outline-secondary btn-sm rounded-pill px-2" title="@L.T("مسح","Clear")">
                     <i class="bi bi-x-lg"></i>
                 </a>
             </div>
@@ -92,8 +92,8 @@
 <!-- Table -->
 <div class="card border-0 shadow-sm">
     <div class="card-header bg-transparent d-flex align-items-center justify-content-between py-2">
-        <span class="fw-semibold small">النتائج: <span class="badge bg-primary rounded-pill">@Model.Count</span></span>
-        <span class="text-muted small d-none d-md-inline"><i class="bi bi-hand-index me-1"></i>انقر على مستخدم لإدارة صلاحياته</span>
+        <span class="fw-semibold small">@L.T("النتائج:","Results:") <span class="badge bg-primary rounded-pill">@Model.Count</span></span>
+        <span class="text-muted small d-none d-md-inline"><i class="bi bi-hand-index me-1"></i>@L.T("انقر على مستخدم لإدارة صلاحياته","Click a user to manage permissions")</span>
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
@@ -101,13 +101,13 @@
                 <thead class="table-light">
                     <tr>
                         <th style="width:46px">#</th>
-                        <th>المستخدم</th>
-                        <th class="d-none d-md-table-cell">البريد</th>
-                        <th>الدور</th>
-                        <th class="d-none d-lg-table-cell">الصلاحيات</th>
-                        <th class="d-none d-md-table-cell">آخر دخول</th>
-                        <th>الحالة</th>
-                        <th style="width:180px">الإجراءات</th>
+                        <th>@L.T("المستخدم","User")</th>
+                        <th class="d-none d-md-table-cell">@L.T("البريد","Email")</th>
+                        <th>@L.T("الدور","Role")</th>
+                        <th class="d-none d-lg-table-cell">@L.T("الصلاحيات","Permissions")</th>
+                        <th class="d-none d-md-table-cell">@L.T("آخر دخول","Last Login")</th>
+                        <th>@L.T("الحالة","Status")</th>
+                        <th style="width:180px">@L.T("الإجراءات","Actions")</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -132,7 +132,7 @@
                                         <div class="fw-semibold small lh-1">
                                             @item.User.FullName
                                             @if (isCurrent)
-                                            { <span class="badge bg-warning text-dark ms-1" style="font-size:0.58rem;vertical-align:middle">أنت</span> }
+                                            { <span class="badge bg-warning text-dark ms-1" style="font-size:0.58rem;vertical-align:middle">@L.T("أنت","You")</span> }
                                         </div>
                                         <div class="text-muted d-md-none" style="font-size:0.72rem">@item.User.Email</div>
                                     </div>
@@ -144,14 +144,14 @@
                                 {
                                     <span class="badge d-inline-flex align-items-center gap-1 px-2 py-1"
                                         style="background:rgba(220,53,69,0.12);color:#dc3545;border:1px solid rgba(220,53,69,0.25);border-radius:20px">
-                                        <i class="bi bi-shield-fill" style="font-size:0.65rem"></i>مدير
+                                        <i class="bi bi-shield-fill" style="font-size:0.65rem"></i>@L.T("مدير","Admin")
                                     </span>
                                 }
                                 else
                                 {
                                     <span class="badge d-inline-flex align-items-center gap-1 px-2 py-1"
                                         style="background:rgba(13,110,253,0.1);color:#0d6efd;border:1px solid rgba(13,110,253,0.2);border-radius:20px">
-                                        <i class="bi bi-person-badge" style="font-size:0.65rem"></i>موظف
+                                        <i class="bi bi-person-badge" style="font-size:0.65rem"></i>@L.T("موظف","Employee")
                                     </span>
                                 }
                             </td>
@@ -159,7 +159,7 @@
                                 @if (isAdmin)
                                 {
                                     <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill">
-                                        <i class="bi bi-infinity me-1"></i>كاملة
+                                        <i class="bi bi-infinity me-1"></i>@L.T("كاملة","Full")
                                     </span>
                                 }
                                 else
@@ -167,13 +167,13 @@
                                     <span class="badge rounded-pill @(permCount == 0 ? "bg-secondary-subtle text-secondary" : "bg-primary-subtle text-primary") border @(permCount == 0 ? "border-secondary-subtle" : "border-primary-subtle")"
                                         style="cursor:pointer"
                                         onclick="openPermissionsModal('@item.User.Id','@item.User.FullName')">
-                                        <i class="bi bi-key me-1"></i>@permCount صلاحية
+                                        <i class="bi bi-key me-1"></i>@permCount @L.T("صلاحية","perms")
                                     </span>
                                 }
                             </td>
                             <td class="small d-none d-md-table-cell">
                                 @if (item.User.LastLoginAt.HasValue)
-                                { <span class="text-muted">@GetTimeAgo(item.User.LastLoginAt.Value)</span> }
+                                { <span class="text-muted">@GetTimeAgo(item.User.LastLoginAt.Value, L.IsAr)</span> }
                                 else
                                 { <span class="text-muted opacity-50">—</span> }
                             </td>
@@ -181,42 +181,38 @@
                                 @if (item.User.IsActive)
                                 {
                                     <span class="badge bg-success-subtle text-success border border-success-subtle d-inline-flex align-items-center gap-1 rounded-pill">
-                                        <span class="rounded-circle bg-success" style="width:5px;height:5px"></span>نشط
+                                        <span class="rounded-circle bg-success" style="width:5px;height:5px"></span>@L.T("نشط","Active")
                                     </span>
                                 }
                                 else
                                 {
                                     <span class="badge bg-secondary-subtle text-secondary border d-inline-flex align-items-center gap-1 rounded-pill">
-                                        <span class="rounded-circle bg-secondary" style="width:5px;height:5px"></span>معطل
+                                        <span class="rounded-circle bg-secondary" style="width:5px;height:5px"></span>@L.T("معطل","Inactive")
                                     </span>
                                 }
                             </td>
                             <td>
                                 <div class="d-flex gap-1 flex-wrap">
-                                    <!-- صلاحيات -->
                                     @if (!isAdmin)
                                     {
-                                        <button class="btn btn-sm btn-outline-warning rounded-pill px-2" title="الصلاحيات"
+                                        <button class="btn btn-sm btn-outline-warning rounded-pill px-2" title="@L.T("الصلاحيات","Permissions")"
                                             onclick="openPermissionsModal('@item.User.Id','@item.User.FullName')">
                                             <i class="bi bi-key-fill"></i>
                                         </button>
                                     }
-                                    <!-- تعديل -->
-                                    <button class="btn btn-sm btn-outline-primary rounded-pill px-2" title="تعديل"
+                                    <button class="btn btn-sm btn-outline-primary rounded-pill px-2" title="@L.T("تعديل","Edit")"
                                         onclick="openEditModal('@item.User.Id','@item.User.FullName','@item.User.Email','@(item.Roles.FirstOrDefault()??"")')">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
-                                    <!-- كلمة المرور -->
-                                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-2" title="كلمة المرور"
+                                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-2" title="@L.T("كلمة المرور","Password")"
                                         onclick="openResetModal('@item.User.Id','@item.User.FullName')">
                                         <i class="bi bi-lock-fill"></i>
                                     </button>
-                                    <!-- تفعيل/تعطيل -->
                                     @if (!isCurrent)
                                     {
                                         <form asp-action="ToggleActive" asp-route-id="@item.User.Id" method="post" class="d-inline">
                                             @Html.AntiForgeryToken()
-                                            <button type="submit" title="@(item.User.IsActive ? "تعطيل" : "تفعيل")"
+                                            <button type="submit" title="@(item.User.IsActive ? L.T("تعطيل","Deactivate") : L.T("تفعيل","Activate"))"
                                                 class="btn btn-sm @(item.User.IsActive ? "btn-outline-danger" : "btn-outline-success") rounded-pill px-2">
                                                 <i class="bi @(item.User.IsActive ? "bi-person-dash" : "bi-person-check")"></i>
                                             </button>
@@ -229,7 +225,7 @@
                     @if (!Model.Any())
                     {
                         <tr><td colspan="8" class="text-center text-muted py-5">
-                            <i class="bi bi-people fs-1 d-block mb-2 opacity-25"></i>لا يوجد مستخدمون
+                            <i class="bi bi-people fs-1 d-block mb-2 opacity-25"></i>@L.T("لا يوجد مستخدمون","No users found")
                         </td></tr>
                     }
                 </tbody>
@@ -241,7 +237,7 @@
 <!-- Permission Groups Reference -->
 <div class="card mt-4 border-0" style="background:var(--bs-tertiary-bg)">
     <div class="card-body pb-2">
-        <h6 class="fw-bold mb-3"><i class="bi bi-grid-3x3-gap text-primary me-2"></i>مرجع الصلاحيات المتاحة</h6>
+        <h6 class="fw-bold mb-3"><i class="bi bi-grid-3x3-gap text-primary me-2"></i>@L.T("مرجع الصلاحيات المتاحة","Available Permissions Reference")</h6>
         <div class="row g-2">
             @foreach (var g in permGroups)
             {
@@ -276,7 +272,7 @@
                     <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white" style="width:38px;height:38px">
                         <i class="bi bi-person-plus-fill"></i>
                     </div>
-                    <h5 class="modal-title fw-bold mb-0">إضافة مستخدم جديد</h5>
+                    <h5 class="modal-title fw-bold mb-0">@L.T("إضافة مستخدم جديد","Add New User")</h5>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -285,36 +281,36 @@
                 <div class="modal-body">
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold small">الاسم الكامل <span class="text-danger">*</span></label>
-                            <input type="text" name="fullName" class="form-control" placeholder="مثال: أحمد محمد" required>
+                            <label class="form-label fw-semibold small">@L.T("الاسم الكامل","Full Name") <span class="text-danger">*</span></label>
+                            <input type="text" name="fullName" class="form-control" placeholder="@L.T("مثال: أحمد محمد","e.g. John Smith")" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold small">البريد الإلكتروني <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold small">@L.T("البريد الإلكتروني","Email") <span class="text-danger">*</span></label>
                             <input type="email" name="email" class="form-control" placeholder="user@example.com" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold small">كلمة المرور <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold small">@L.T("كلمة المرور","Password") <span class="text-danger">*</span></label>
                             <div class="input-group">
-                                <input type="password" name="password" id="addPwd" class="form-control" required minlength="6" placeholder="••••••••">
+                                <input type="password" name="password" id="addPwd" class="form-control" required minlength="8" placeholder="••••••••">
                                 <button type="button" class="btn btn-outline-secondary" onclick="togglePwd('addPwd','addPwdEye')">
                                     <i class="bi bi-eye" id="addPwdEye"></i>
                                 </button>
                             </div>
-                            <div class="form-text small">6 أحرف كحد أدنى</div>
+                            <div class="form-text small">@L.T("8 أحرف كحد أدنى، يجب أن تحتوي على رقم وحرف كبير ورمز","Min 8 chars with digit, uppercase & symbol")</div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold small">الدور <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold small">@L.T("الدور","Role") <span class="text-danger">*</span></label>
                             <div class="d-flex gap-2">
                                 <div class="flex-fill">
                                     <input type="radio" class="btn-check" name="role" id="addRoleEmp" value="Employee" checked onchange="onRoleChange()">
                                     <label class="btn btn-outline-primary w-100" for="addRoleEmp">
-                                        <i class="bi bi-person-badge me-1"></i>موظف
+                                        <i class="bi bi-person-badge me-1"></i>@L.T("موظف","Employee")
                                     </label>
                                 </div>
                                 <div class="flex-fill">
                                     <input type="radio" class="btn-check" name="role" id="addRoleAdmin" value="Admin" onchange="onRoleChange()">
                                     <label class="btn btn-outline-danger w-100" for="addRoleAdmin">
-                                        <i class="bi bi-shield-fill me-1"></i>مدير
+                                        <i class="bi bi-shield-fill me-1"></i>@L.T("مدير","Admin")
                                     </label>
                                 </div>
                             </div>
@@ -325,11 +321,11 @@
                     <div id="permissionsSection">
                         <hr class="my-2">
                         <div class="d-flex align-items-center justify-content-between mb-2">
-                            <span class="fw-semibold small"><i class="bi bi-key-fill text-warning me-1"></i>الصلاحيات</span>
+                            <span class="fw-semibold small"><i class="bi bi-key-fill text-warning me-1"></i>@L.T("الصلاحيات","Permissions")</span>
                             <div class="d-flex gap-1">
-                                <button type="button" class="btn btn-xs btn-outline-success rounded-pill px-2 py-0" onclick="checkAll(true)" style="font-size:0.75rem">تحديد الكل</button>
-                                <button type="button" class="btn btn-xs btn-outline-secondary rounded-pill px-2 py-0" onclick="checkAll(false)" style="font-size:0.75rem">إلغاء الكل</button>
-                                <button type="button" class="btn btn-xs btn-outline-primary rounded-pill px-2 py-0" onclick="setDefaults()" style="font-size:0.75rem">الافتراضية</button>
+                                <button type="button" class="btn btn-xs btn-outline-success rounded-pill px-2 py-0" onclick="checkAll(true)" style="font-size:0.75rem">@L.T("تحديد الكل","Select All")</button>
+                                <button type="button" class="btn btn-xs btn-outline-secondary rounded-pill px-2 py-0" onclick="checkAll(false)" style="font-size:0.75rem">@L.T("إلغاء الكل","Clear All")</button>
+                                <button type="button" class="btn btn-xs btn-outline-primary rounded-pill px-2 py-0" onclick="setDefaults()" style="font-size:0.75rem">@L.T("الافتراضية","Defaults")</button>
                             </div>
                         </div>
                         <div class="row g-2">
@@ -343,7 +339,7 @@
                                                     <i class="bi @g.Icon me-1"></i>@g.Label
                                                 </span>
                                                 <button type="button" class="btn-link text-muted p-0 border-0 bg-transparent"
-                                                    style="font-size:0.7rem" onclick="checkGroup('@g.Label', true)">تحديد</button>
+                                                    style="font-size:0.7rem" onclick="checkGroup('@g.Label', true)">@L.T("تحديد","Select")</button>
                                             </div>
                                             @foreach (var pitem in g.Items)
                                             {
@@ -364,14 +360,14 @@
                             }
                         </div>
                         <div class="mt-2 text-muted small">
-                            <i class="bi bi-info-circle me-1"></i>الصلاحيات تنطبق فقط على حساب <strong>موظف</strong>. المدير يملك كافة الصلاحيات تلقائياً.
+                            <i class="bi bi-info-circle me-1"></i>@L.T("الصلاحيات تنطبق فقط على حساب موظف. المدير يملك كافة الصلاحيات تلقائياً.","Permissions apply only to Employee accounts. Admins have all permissions automatically.")
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer border-0">
-                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">@L.T("إلغاء","Cancel")</button>
                     <button type="submit" class="btn btn-primary rounded-pill px-4">
-                        <i class="bi bi-person-check-fill me-2"></i>إنشاء الحساب
+                        <i class="bi bi-person-check-fill me-2"></i>@L.T("إنشاء الحساب","Create Account")
                     </button>
                 </div>
             </form>
@@ -388,7 +384,7 @@
                     <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white" style="width:38px;height:38px">
                         <i class="bi bi-pencil-square"></i>
                     </div>
-                    <h5 class="modal-title fw-bold mb-0">تعديل بيانات المستخدم</h5>
+                    <h5 class="modal-title fw-bold mb-0">@L.T("تعديل بيانات المستخدم","Edit User")</h5>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -397,35 +393,35 @@
                 <input type="hidden" name="id" id="editId">
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label fw-semibold small">الاسم الكامل</label>
+                        <label class="form-label fw-semibold small">@L.T("الاسم الكامل","Full Name")</label>
                         <input type="text" name="fullName" id="editName" class="form-control" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-semibold small">البريد الإلكتروني</label>
+                        <label class="form-label fw-semibold small">@L.T("البريد الإلكتروني","Email")</label>
                         <input type="email" name="email" id="editEmail" class="form-control" required>
                     </div>
                     <div>
-                        <label class="form-label fw-semibold small">الدور</label>
+                        <label class="form-label fw-semibold small">@L.T("الدور","Role")</label>
                         <div class="d-flex gap-2">
                             <div class="flex-fill">
                                 <input type="radio" class="btn-check" name="role" id="editRoleEmp" value="Employee">
                                 <label class="btn btn-outline-primary w-100" for="editRoleEmp">
-                                    <i class="bi bi-person-badge me-1"></i>موظف
+                                    <i class="bi bi-person-badge me-1"></i>@L.T("موظف","Employee")
                                 </label>
                             </div>
                             <div class="flex-fill">
                                 <input type="radio" class="btn-check" name="role" id="editRoleAdmin" value="Admin">
                                 <label class="btn btn-outline-danger w-100" for="editRoleAdmin">
-                                    <i class="bi bi-shield-fill me-1"></i>مدير
+                                    <i class="bi bi-shield-fill me-1"></i>@L.T("مدير","Admin")
                                 </label>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer border-0">
-                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">@L.T("إلغاء","Cancel")</button>
                     <button type="submit" class="btn btn-primary rounded-pill px-4">
-                        <i class="bi bi-save2 me-2"></i>حفظ
+                        <i class="bi bi-save2 me-2"></i>@L.T("حفظ","Save")
                     </button>
                 </div>
             </form>
@@ -443,7 +439,7 @@
                         <i class="bi bi-key-fill fs-6"></i>
                     </div>
                     <div>
-                        <h5 class="modal-title fw-bold mb-0">إدارة الصلاحيات</h5>
+                        <h5 class="modal-title fw-bold mb-0">@L.T("إدارة الصلاحيات","Manage Permissions")</h5>
                         <small class="text-muted" id="permModalUser"></small>
                     </div>
                 </div>
@@ -454,16 +450,16 @@
                 <input type="hidden" name="id" id="permUserId">
                 <div class="modal-body pt-2">
                     <div class="d-flex align-items-center justify-content-between mb-3 p-2 rounded" style="background:var(--bs-tertiary-bg)">
-                        <span class="small text-muted"><i class="bi bi-info-circle me-1"></i>اختر الصلاحيات المناسبة للمستخدم</span>
+                        <span class="small text-muted"><i class="bi bi-info-circle me-1"></i>@L.T("اختر الصلاحيات المناسبة للمستخدم","Select the appropriate permissions for this user")</span>
                         <div class="d-flex gap-1">
                             <button type="button" class="btn btn-sm btn-success rounded-pill px-3" onclick="permCheckAll(true)">
-                                <i class="bi bi-check-all me-1"></i>تحديد الكل
+                                <i class="bi bi-check-all me-1"></i>@L.T("تحديد الكل","Select All")
                             </button>
                             <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="permCheckAll(false)">
-                                <i class="bi bi-x me-1"></i>إلغاء الكل
+                                <i class="bi bi-x me-1"></i>@L.T("إلغاء الكل","Clear All")
                             </button>
                             <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="permSetDefaults()">
-                                <i class="bi bi-stars me-1"></i>الافتراضية
+                                <i class="bi bi-stars me-1"></i>@L.T("الافتراضية","Defaults")
                             </button>
                         </div>
                     </div>
@@ -481,7 +477,7 @@
                                             <div class="form-check mb-0">
                                                 <input class="form-check-input group-check" type="checkbox"
                                                     id="groupAll_@g.Label" onchange="toggleGroup('@g.Label', this.checked)"
-                                                    title="تحديد مجموعة @g.Label">
+                                                    title="@L.T("تحديد مجموعة","Select group") @g.Label">
                                             </div>
                                         </div>
                                     </div>
@@ -507,15 +503,15 @@
                     <div class="mt-3 p-2 rounded border border-primary-subtle bg-primary-subtle">
                         <small class="text-primary fw-semibold">
                             <i class="bi bi-shield-check me-1"></i>
-                            الصلاحيات المحددة: <span id="permCount" class="fw-black">0</span>
-                            من أصل <strong>@Permissions.All.Count()</strong>
+                            @L.T("الصلاحيات المحددة:","Selected permissions:") <span id="permCount" class="fw-black">0</span>
+                            @L.T("من أصل","of") <strong>@Permissions.All.Count()</strong>
                         </small>
                     </div>
                 </div>
                 <div class="modal-footer border-0">
-                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">@L.T("إلغاء","Cancel")</button>
                     <button type="submit" class="btn btn-warning rounded-pill px-4 text-dark fw-semibold">
-                        <i class="bi bi-save2 me-2"></i>حفظ الصلاحيات
+                        <i class="bi bi-save2 me-2"></i>@L.T("حفظ الصلاحيات","Save Permissions")
                     </button>
                 </div>
             </form>
@@ -532,26 +528,26 @@
                     <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white" style="width:38px;height:38px">
                         <i class="bi bi-lock-fill"></i>
                     </div>
-                    <h5 class="modal-title fw-bold mb-0">تغيير كلمة المرور</h5>
+                    <h5 class="modal-title fw-bold mb-0">@L.T("تغيير كلمة المرور","Change Password")</h5>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form asp-action="ResetPassword" method="post">
                 @Html.AntiForgeryToken()
                 <div class="modal-body pt-2">
-                    <p class="small text-muted mb-3">المستخدم: <strong id="resetName"></strong></p>
+                    <p class="small text-muted mb-3">@L.T("المستخدم:","User:") <strong id="resetName"></strong></p>
                     <input type="hidden" name="id" id="resetId">
                     <div class="input-group">
-                        <input type="password" name="newPassword" id="resetPwd" class="form-control" required minlength="6" placeholder="كلمة مرور جديدة">
+                        <input type="password" name="newPassword" id="resetPwd" class="form-control" required minlength="8" placeholder="@L.T("كلمة مرور جديدة","New password")">
                         <button type="button" class="btn btn-outline-secondary" onclick="togglePwd('resetPwd','resetEye')">
                             <i class="bi bi-eye" id="resetEye"></i>
                         </button>
                     </div>
                 </div>
                 <div class="modal-footer border-0">
-                    <button type="button" class="btn btn-outline-secondary rounded-pill" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-outline-secondary rounded-pill" data-bs-dismiss="modal">@L.T("إلغاء","Cancel")</button>
                     <button type="submit" class="btn btn-dark rounded-pill fw-semibold">
-                        <i class="bi bi-lock me-1"></i>تغيير
+                        <i class="bi bi-lock me-1"></i>@L.T("تغيير","Change")
                     </button>
                 </div>
             </form>
@@ -562,12 +558,8 @@
 
 @section Scripts {
 <script>
-// ─── Modal openers ───────────────────────────────────────
 function openAddModal() {
     document.getElementById('addUserForm').reset();
-    document.querySelectorAll('.perm-check').forEach(cb => {
-        cb.checked = cb.dataset.default === 'true';
-    });
     setDefaults();
     onRoleChange();
     new bootstrap.Modal(document.getElementById('addUserModal')).show();
@@ -585,25 +577,18 @@ function openEditModal(id, name, email, role) {
 async function openPermissionsModal(id, name) {
     document.getElementById('permUserId').value = id;
     document.getElementById('permModalUser').textContent = name;
-
-    // جلب صلاحيات المستخدم الحالية
     try {
         const res = await fetch(`/Users/GetUserPermissions?id=${id}`);
         const data = await res.json();
         const userPerms = data.permissions || [];
-
         document.querySelectorAll('.perm-modal-check').forEach(cb => {
             cb.checked = userPerms.includes(cb.value);
         });
-
-        // تحديث checkboxes المجموعات
         document.querySelectorAll('.perm-modal-check').forEach(cb => {
             updateGroupCheck(cb.dataset.group);
         });
-
         updatePermCount();
     } catch {}
-
     new bootstrap.Modal(document.getElementById('permissionsModal')).show();
 }
 
@@ -614,7 +599,6 @@ function openResetModal(id, name) {
     new bootstrap.Modal(document.getElementById('resetModal')).show();
 }
 
-// ─── Permissions helpers ──────────────────────────────────
 const defaults = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Permissions.EmployeeDefaults));
 
 function setDefaults() {
@@ -665,14 +649,12 @@ function updatePermCount() {
     document.getElementById('permCount').textContent = count;
 }
 
-// ─── Role change → show/hide permissions ─────────────────
 function onRoleChange() {
     const isAdmin = document.getElementById('addRoleAdmin').checked;
     document.getElementById('permissionsSection').style.opacity = isAdmin ? '0.4' : '1';
     document.getElementById('permissionsSection').style.pointerEvents = isAdmin ? 'none' : 'auto';
 }
 
-// ─── Password toggle ──────────────────────────────────────
 function togglePwd(inputId, eyeId) {
     const el = document.getElementById(inputId);
     const ic = document.getElementById(eyeId);
@@ -683,13 +665,22 @@ function togglePwd(inputId, eyeId) {
 }
 
 @functions {
-    string GetTimeAgo(DateTime dt) {
-        var d = DateTime.Now - dt;
-        if (d.TotalMinutes < 1)  return "الآن";
-        if (d.TotalHours   < 1)  return $"منذ {(int)d.TotalMinutes} دقيقة";
-        if (d.TotalDays    < 1)  return $"منذ {(int)d.TotalHours} ساعة";
-        if (d.TotalDays    < 30) return $"منذ {(int)d.TotalDays} يوم";
-        if (d.TotalDays   < 365) return $"منذ {(int)(d.TotalDays/30)} شهر";
-        return $"منذ {(int)(d.TotalDays/365)} سنة";
+    string GetTimeAgo(DateTime dt, bool isAr) {
+        var d = DateTime.UtcNow - dt;
+        if (isAr) {
+            if (d.TotalMinutes < 1)  return "الآن";
+            if (d.TotalHours   < 1)  return $"منذ {(int)d.TotalMinutes} دقيقة";
+            if (d.TotalDays    < 1)  return $"منذ {(int)d.TotalHours} ساعة";
+            if (d.TotalDays    < 30) return $"منذ {(int)d.TotalDays} يوم";
+            if (d.TotalDays   < 365) return $"منذ {(int)(d.TotalDays/30)} شهر";
+            return $"منذ {(int)(d.TotalDays/365)} سنة";
+        } else {
+            if (d.TotalMinutes < 1)  return "just now";
+            if (d.TotalHours   < 1)  return $"{(int)d.TotalMinutes}m ago";
+            if (d.TotalDays    < 1)  return $"{(int)d.TotalHours}h ago";
+            if (d.TotalDays    < 30) return $"{(int)d.TotalDays}d ago";
+            if (d.TotalDays   < 365) return $"{(int)(d.TotalDays/30)}mo ago";
+            return $"{(int)(d.TotalDays/365)}y ago";
+        }
     }
 }

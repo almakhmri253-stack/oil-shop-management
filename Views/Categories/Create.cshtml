@@ -1,13 +1,13 @@
 @model OilShopManagement.Models.Category
 @{
-    ViewData["Title"] = "تصنيف جديد";
+    ViewData["Title"] = L.T("تصنيف جديد","New Category");
 }
 
 <div class="d-flex align-items-center gap-3 mb-4">
     <a href="/Categories" class="btn btn-outline-secondary rounded-circle" style="width:38px;height:38px;padding:0;display:flex;align-items:center;justify-content:center">
         <i class="bi bi-arrow-right"></i>
     </a>
-    <h4 class="fw-bold mb-0">إضافة تصنيف جديد</h4>
+    <h4 class="fw-bold mb-0">@L.T("إضافة تصنيف جديد","Add New Category")</h4>
 </div>
 
 <div class="card" style="max-width:500px">
@@ -25,9 +25,9 @@
             </div>
             <div class="d-flex gap-2">
                 <button type="submit" class="btn btn-primary px-4 rounded-pill">
-                    <i class="bi bi-save2 me-2"></i>حفظ
+                    <i class="bi bi-save2 me-2"></i>@L.T("حفظ","Save")
                 </button>
-                <a href="/Categories" class="btn btn-outline-secondary rounded-pill">إلغاء</a>
+                <a href="/Categories" class="btn btn-outline-secondary rounded-pill">@L.T("إلغاء","Cancel")</a>
             </div>
         </form>
     </div>

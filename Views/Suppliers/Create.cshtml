@@ -1,12 +1,12 @@
 @model OilShopManagement.Models.Supplier
 @{
-    ViewData["Title"] = "مورد جديد";
+    ViewData["Title"] = L.T("مورد جديد","New Supplier");
 }
 
 <div class="d-flex align-items-center justify-content-between mb-3">
-    <h4 class="fw-bold mb-0"><i class="bi bi-truck me-2 text-primary"></i>مورد جديد</h4>
+    <h4 class="fw-bold mb-0"><i class="bi bi-truck me-2 text-primary"></i>@L.T("مورد جديد","New Supplier")</h4>
     <a href="/Suppliers" class="btn btn-outline-secondary rounded-pill btn-sm">
-        <i class="bi bi-arrow-right me-1"></i>الموردون
+        <i class="bi bi-arrow-right me-1"></i>@L.T("الموردون","Suppliers")
     </a>
 </div>
 
@@ -16,32 +16,32 @@
             @Html.AntiForgeryToken()
             <div class="mb-3">
                 <label asp-for="Name" class="form-label fw-semibold"></label>
-                <input asp-for="Name" class="form-control" placeholder="اسم المورد">
+                <input asp-for="Name" class="form-control" placeholder="@L.T("اسم المورد","Supplier name")">
                 <span asp-validation-for="Name" class="text-danger small"></span>
             </div>
             <div class="row g-3 mb-3">
                 <div class="col-md-6">
                     <label asp-for="Phone" class="form-label fw-semibold"></label>
-                    <input asp-for="Phone" class="form-control" placeholder="رقم الهاتف">
+                    <input asp-for="Phone" class="form-control" placeholder="@L.T("رقم الهاتف","Phone number")">
                 </div>
                 <div class="col-md-6">
                     <label asp-for="Email" class="form-label fw-semibold"></label>
-                    <input asp-for="Email" class="form-control" placeholder="البريد الإلكتروني">
+                    <input asp-for="Email" class="form-control" placeholder="@L.T("البريد الإلكتروني","Email address")">
                 </div>
             </div>
             <div class="mb-3">
                 <label asp-for="ContactPerson" class="form-label fw-semibold"></label>
-                <input asp-for="ContactPerson" class="form-control" placeholder="اسم المسؤول">
+                <input asp-for="ContactPerson" class="form-control" placeholder="@L.T("اسم المسؤول","Contact name")">
             </div>
             <div class="mb-3">
                 <label asp-for="Address" class="form-label fw-semibold"></label>
-                <textarea asp-for="Address" class="form-control" rows="2" placeholder="العنوان"></textarea>
+                <textarea asp-for="Address" class="form-control" rows="2" placeholder="@L.T("العنوان","Address")"></textarea>
             </div>
             <div class="d-flex gap-2">
                 <button type="submit" class="btn btn-primary rounded-pill px-4">
-                    <i class="bi bi-save2 me-1"></i>حفظ
+                    <i class="bi bi-save2 me-1"></i>@L.T("حفظ","Save")
                 </button>
-                <a href="/Suppliers" class="btn btn-outline-secondary rounded-pill px-4">إلغاء</a>
+                <a href="/Suppliers" class="btn btn-outline-secondary rounded-pill px-4">@L.T("إلغاء","Cancel")</a>
             </div>
         </form>
     </div>
