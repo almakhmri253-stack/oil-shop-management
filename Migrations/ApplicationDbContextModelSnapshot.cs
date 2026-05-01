@@ -268,33 +268,33 @@ namespace OilShopManagement.Migrations
                         {
                             Id = 1,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "جميع أنواع زيوت المحرك",
+                            Description = "ط¬ظ…ظٹط¹ ط£ظ†ظˆط§ط¹ ط²ظٹظˆطھ ط§ظ„ظ…ط­ط±ظƒ",
                             IsActive = true,
-                            Name = "زيت محرك"
+                            Name = "ط²ظٹطھ ظ…ط­ط±ظƒ"
                         },
                         new
                         {
                             Id = 2,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "زيوت ناقل الحركة",
+                            Description = "ط²ظٹظˆطھ ظ†ط§ظ‚ظ„ ط§ظ„ط­ط±ظƒط©",
                             IsActive = true,
-                            Name = "زيت قير"
+                            Name = "ط²ظٹطھ ظ‚ظٹط±"
                         },
                         new
                         {
                             Id = 3,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "فلاتر الزيت والهواء",
+                            Description = "ظپظ„ط§طھط± ط§ظ„ط²ظٹطھ ظˆط§ظ„ظ‡ظˆط§ط،",
                             IsActive = true,
-                            Name = "فلاتر"
+                            Name = "ظپظ„ط§طھط±"
                         },
                         new
                         {
                             Id = 4,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "إضافات ومواد تشحيم",
+                            Description = "ط¥ط¶ط§ظپط§طھ ظˆظ…ظˆط§ط¯ طھط´ط­ظٹظ…",
                             IsActive = true,
-                            Name = "إضافات"
+                            Name = "ط¥ط¶ط§ظپط§طھ"
                         });
                 });
 
@@ -1105,4 +1105,3 @@ namespace OilShopManagement.Migrations
         }
     }
 }
-

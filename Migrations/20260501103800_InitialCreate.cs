@@ -535,10 +535,10 @@ namespace OilShopManagement.Migrations
                 columns: new[] { "Id", "CreatedAt", "Description", "IsActive", "Name" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "جميع أنواع زيوت المحرك", true, "زيت محرك" },
-                    { 2, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "زيوت ناقل الحركة", true, "زيت قير" },
-                    { 3, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "فلاتر الزيت والهواء", true, "فلاتر" },
-                    { 4, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "إضافات ومواد تشحيم", true, "إضافات" }
+                    { 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "ط¬ظ…ظٹط¹ ط£ظ†ظˆط§ط¹ ط²ظٹظˆطھ ط§ظ„ظ…ط­ط±ظƒ", true, "ط²ظٹطھ ظ…ط­ط±ظƒ" },
+                    { 2, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "ط²ظٹظˆطھ ظ†ط§ظ‚ظ„ ط§ظ„ط­ط±ظƒط©", true, "ط²ظٹطھ ظ‚ظٹط±" },
+                    { 3, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "ظپظ„ط§طھط± ط§ظ„ط²ظٹطھ ظˆط§ظ„ظ‡ظˆط§ط،", true, "ظپظ„ط§طھط±" },
+                    { 4, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "ط¥ط¶ط§ظپط§طھ ظˆظ…ظˆط§ط¯ طھط´ط­ظٹظ…", true, "ط¥ط¶ط§ظپط§طھ" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -724,4 +724,3 @@ namespace OilShopManagement.Migrations
         }
     }
 }
-
