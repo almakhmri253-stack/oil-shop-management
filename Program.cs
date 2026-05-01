@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +20,7 @@ try
     var builder = WebApplication.CreateBuilder(args);
     builder.Host.UseSerilog((ctx, lc) => lc.ReadFrom.Configuration(ctx.Configuration));
 
-    // Database — support Railway's DATABASE_URL or local appsettings connection string
+    // Database â€” support Railway's DATABASE_URL or local appsettings connection string
     var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
     string connStr;
     if (!string.IsNullOrEmpty(databaseUrl))
@@ -134,3 +134,4 @@ finally
 {
     Log.CloseAndFlush();
 }
+

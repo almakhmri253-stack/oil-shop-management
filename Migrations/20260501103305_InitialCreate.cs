@@ -724,3 +724,4 @@ namespace OilShopManagement.Migrations
         }
     }
 }
+

@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OilShopManagement.Data;
@@ -59,7 +59,7 @@ public class PurchaseReturnsController : Controller
                 .FirstOrDefaultAsync(p => p.Id == purchaseId.Value);
             ViewBag.Purchase = purchase;
         }
-        return View(new PurchaseReturnCreateViewModel { PurchaseId = purchaseId, ReturnDate = DateTime.Now });
+        return View(new PurchaseReturnCreateViewModel { PurchaseId = purchaseId, ReturnDate = DateTime.UtcNow });
     }
 
     [HttpPost]
@@ -67,7 +67,7 @@ public class PurchaseReturnsController : Controller
     public async Task<IActionResult> Create([FromBody] PurchaseReturnCreateViewModel vm)
     {
         if (!vm.Items.Any() && (vm.ManualTotal == null || vm.ManualTotal <= 0))
-            return BadRequest(new { message = "يجب إضافة منتج أو إدخال المبلغ" });
+            return BadRequest(new { message = "ظٹط¬ط¨ ط¥ط¶ط§ظپط© ظ…ظ†طھط¬ ط£ظˆ ط¥ط¯ط®ط§ظ„ ط§ظ„ظ…ط¨ظ„ط؛" });
 
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
@@ -80,16 +80,16 @@ public class PurchaseReturnsController : Controller
                 ReturnDate = vm.ReturnDate,
                 Reason = vm.Reason,
                 CreatedByUserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.UtcNow
             };
 
             decimal total = 0;
             foreach (var item in vm.Items)
             {
                 var product = await _context.Products.FindAsync(item.ProductId);
-                if (product == null) return BadRequest(new { message = "المنتج غير موجود" });
+                if (product == null) return BadRequest(new { message = "ط§ظ„ظ…ظ†طھط¬ ط؛ظٹط± ظ…ظˆط¬ظˆط¯" });
                 if (product.CurrentStock < item.Quantity)
-                    return BadRequest(new { message = $"الكمية المتوفرة من {product.Name} هي {product.CurrentStock} فقط" });
+                    return BadRequest(new { message = $"ط§ظ„ظƒظ…ظٹط© ط§ظ„ظ…طھظˆظپط±ط© ظ…ظ† {product.Name} ظ‡ظٹ {product.CurrentStock} ظپظ‚ط·" });
 
                 var retItem = new PurchaseReturnItem
                 {
@@ -112,9 +112,9 @@ public class PurchaseReturnsController : Controller
                     QuantityBefore = before,
                     QuantityAfter = product.CurrentStock,
                     UnitPrice = item.UnitPrice,
-                    Notes = $"مرتجع شراء {ret.ReturnNumber}",
+                    Notes = $"ظ…ط±طھط¬ط¹ ط´ط±ط§ط، {ret.ReturnNumber}",
                     UserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
-                    CreatedAt = DateTime.Now
+                    CreatedAt = DateTime.UtcNow
                 });
                 _context.Products.Update(product);
             }
@@ -130,7 +130,7 @@ public class PurchaseReturnsController : Controller
         {
             await transaction.RollbackAsync();
             _logger.LogError(ex, "Error creating purchase return");
-            return StatusCode(500, new { message = "حدث خطأ أثناء إنشاء المرتجع" });
+            return StatusCode(500, new { message = "ط­ط¯ط« ط®ط·ط£ ط£ط«ظ†ط§ط، ط¥ظ†ط´ط§ط، ط§ظ„ظ…ط±طھط¬ط¹" });
         }
     }
 
@@ -141,3 +141,4 @@ public class PurchaseReturnsController : Controller
         return $"PR-{today:yyyyMMdd}-{(count + 1):D4}";
     }
 }
+

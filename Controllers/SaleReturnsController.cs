@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OilShopManagement.Data;
@@ -64,7 +64,7 @@ public class SaleReturnsController : Controller
                 .FirstOrDefaultAsync(i => i.Id == invoiceId.Value);
             ViewBag.Invoice = invoice;
         }
-        return View(new SaleReturnCreateViewModel { InvoiceId = invoiceId, ReturnDate = DateTime.Now });
+        return View(new SaleReturnCreateViewModel { InvoiceId = invoiceId, ReturnDate = DateTime.UtcNow });
     }
 
     [HttpPost]
@@ -72,7 +72,7 @@ public class SaleReturnsController : Controller
     public async Task<IActionResult> Create([FromBody] SaleReturnCreateViewModel vm)
     {
         if (!vm.Items.Any() && (vm.ManualTotal == null || vm.ManualTotal <= 0))
-            return BadRequest(new { message = "يجب إضافة منتج أو إدخال المبلغ" });
+            return BadRequest(new { message = "ظٹط¬ط¨ ط¥ط¶ط§ظپط© ظ…ظ†طھط¬ ط£ظˆ ط¥ط¯ط®ط§ظ„ ط§ظ„ظ…ط¨ظ„ط؛" });
 
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
@@ -85,14 +85,14 @@ public class SaleReturnsController : Controller
                 ReturnDate = vm.ReturnDate,
                 Reason = vm.Reason,
                 CreatedByUserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.UtcNow
             };
 
             decimal total = 0;
             foreach (var item in vm.Items)
             {
                 var product = await _context.Products.FindAsync(item.ProductId);
-                if (product == null) return BadRequest(new { message = "المنتج غير موجود" });
+                if (product == null) return BadRequest(new { message = "ط§ظ„ظ…ظ†طھط¬ ط؛ظٹط± ظ…ظˆط¬ظˆط¯" });
 
                 var retItem = new SaleReturnItem
                 {
@@ -115,9 +115,9 @@ public class SaleReturnsController : Controller
                     QuantityBefore = before,
                     QuantityAfter = product.CurrentStock,
                     UnitPrice = item.UnitPrice,
-                    Notes = $"مرتجع مبيعات {ret.ReturnNumber}",
+                    Notes = $"ظ…ط±طھط¬ط¹ ظ…ط¨ظٹط¹ط§طھ {ret.ReturnNumber}",
                     UserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
-                    CreatedAt = DateTime.Now
+                    CreatedAt = DateTime.UtcNow
                 });
                 _context.Products.Update(product);
             }
@@ -133,7 +133,7 @@ public class SaleReturnsController : Controller
         {
             await transaction.RollbackAsync();
             _logger.LogError(ex, "Error creating sale return");
-            return StatusCode(500, new { message = "حدث خطأ أثناء إنشاء المرتجع" });
+            return StatusCode(500, new { message = "ط­ط¯ط« ط®ط·ط£ ط£ط«ظ†ط§ط، ط¥ظ†ط´ط§ط، ط§ظ„ظ…ط±طھط¬ط¹" });
         }
     }
 
@@ -144,3 +144,4 @@ public class SaleReturnsController : Controller
         return $"SR-{today:yyyyMMdd}-{(count + 1):D4}";
     }
 }
+

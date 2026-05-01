@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace OilShopManagement.ViewModels;
 
@@ -16,11 +16,11 @@ public class PurchaseReturnCreateViewModel
     public int? PurchaseId { get; set; }
     public int? SupplierId { get; set; }
 
-    [Display(Name = "تاريخ الإرجاع")]
-    public DateTime ReturnDate { get; set; } = DateTime.Now;
+    [Display(Name = "طھط§ط±ظٹط® ط§ظ„ط¥ط±ط¬ط§ط¹")]
+    public DateTime ReturnDate { get; set; } = DateTime.UtcNow;
 
     [StringLength(500)]
-    [Display(Name = "سبب الإرجاع")]
+    [Display(Name = "ط³ط¨ط¨ ط§ظ„ط¥ط±ط¬ط§ط¹")]
     public string? Reason { get; set; }
 
     public decimal? ManualTotal { get; set; }
@@ -32,13 +32,14 @@ public class SaleReturnCreateViewModel
     public int? InvoiceId { get; set; }
     public int? CustomerId { get; set; }
 
-    [Display(Name = "تاريخ الإرجاع")]
-    public DateTime ReturnDate { get; set; } = DateTime.Now;
+    [Display(Name = "طھط§ط±ظٹط® ط§ظ„ط¥ط±ط¬ط§ط¹")]
+    public DateTime ReturnDate { get; set; } = DateTime.UtcNow;
 
     [StringLength(500)]
-    [Display(Name = "سبب الإرجاع")]
+    [Display(Name = "ط³ط¨ط¨ ط§ظ„ط¥ط±ط¬ط§ط¹")]
     public string? Reason { get; set; }
 
     public decimal? ManualTotal { get; set; }
     public List<ReturnItemViewModel> Items { get; set; } = [];
 }
+

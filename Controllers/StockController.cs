@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using OilShopManagement.Models;
@@ -63,7 +63,7 @@ public class StockController : Controller
 
             if (product.CurrentStock < 0)
             {
-                ModelState.AddModelError("Quantity", "الكمية لا يمكن أن تكون أقل من صفر");
+                ModelState.AddModelError("Quantity", "ط§ظ„ظƒظ…ظٹط© ظ„ط§ ظٹظ…ظƒظ† ط£ظ† طھظƒظˆظ† ط£ظ‚ظ„ ظ…ظ† طµظپط±");
                 vm.Products = new SelectList(await _products.GetAllWithCategoryAsync(), "Id", "Name");
                 return View(vm);
             }
@@ -78,15 +78,16 @@ public class StockController : Controller
                 UnitPrice = vm.UnitPrice,
                 Notes = vm.Notes,
                 UserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.UtcNow
             });
             _products.Update(product);
             await _stock.SaveChangesAsync();
 
-            TempData["Success"] = "تم تعديل المخزون بنجاح";
+            TempData["Success"] = "طھظ… طھط¹ط¯ظٹظ„ ط§ظ„ظ…ط®ط²ظˆظ† ط¨ظ†ط¬ط§ط­";
             return RedirectToAction(nameof(Index));
         }
         vm.Products = new SelectList(await _products.GetAllWithCategoryAsync(), "Id", "Name");
         return View(vm);
     }
 }
+

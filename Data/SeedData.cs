@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using OilShopManagement.Models;
 
 namespace OilShopManagement.Data;
@@ -23,10 +23,10 @@ public static class SeedData
             {
                 UserName = "admin@oilshop.com",
                 Email = "admin@oilshop.com",
-                FullName = "مدير النظام",
+                FullName = "ظ…ط¯ظٹط± ط§ظ„ظ†ط¸ط§ظ…",
                 IsActive = true,
                 EmailConfirmed = true,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.UtcNow
             };
             var result = await userManager.CreateAsync(admin, "Admin@123456");
             if (result.Succeeded)
@@ -34,3 +34,4 @@ public static class SeedData
         }
     }
 }
+

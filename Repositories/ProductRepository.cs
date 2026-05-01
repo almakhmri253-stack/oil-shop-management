@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using OilShopManagement.Data;
 using OilShopManagement.Models;
 
@@ -29,3 +29,4 @@ public class ProductRepository : Repository<Product>, IProductRepository
             .Where(p => p.IsActive && p.CategoryId == categoryId)
             .ToListAsync();
 }
+

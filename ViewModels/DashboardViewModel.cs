@@ -1,4 +1,4 @@
-using OilShopManagement.Models;
+﻿using OilShopManagement.Models;
 
 namespace OilShopManagement.ViewModels;
 
@@ -22,3 +22,4 @@ public class DashboardViewModel
     public List<decimal> ChartSalesData { get; set; } = [];
     public List<decimal> ChartProfitData { get; set; } = [];
 }
+

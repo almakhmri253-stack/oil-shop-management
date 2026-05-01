@@ -1,4 +1,4 @@
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 
 namespace OilShopManagement.Repositories;
 
@@ -14,3 +14,4 @@ public interface IRepository<T> where T : class
     Task<int> CountAsync();
     Task<int> CountAsync(Expression<Func<T, bool>> predicate);
 }
+

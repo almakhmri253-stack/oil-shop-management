@@ -1,4 +1,4 @@
-using OilShopManagement.Models;
+﻿using OilShopManagement.Models;
 
 namespace OilShopManagement.Repositories;
 
@@ -12,3 +12,4 @@ public interface IInvoiceRepository : IRepository<Invoice>
     Task<decimal> GetTotalSalesAsync(DateTime from, DateTime to);
     Task<decimal> GetTotalProfitAsync(DateTime from, DateTime to);
 }
+

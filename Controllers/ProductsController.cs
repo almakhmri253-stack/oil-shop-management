@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -94,17 +94,17 @@ public class ProductsController : Controller
         {
             try
             {
-                product.CreatedAt = DateTime.Now;
+                product.CreatedAt = DateTime.UtcNow;
                 product.ImagePath = await SaveImageAsync(imageFile);
                 await _products.AddAsync(product);
                 await _products.SaveChangesAsync();
-                TempData["Success"] = "تم إضافة المنتج بنجاح";
+                TempData["Success"] = "طھظ… ط¥ط¶ط§ظپط© ط§ظ„ظ…ظ†طھط¬ ط¨ظ†ط¬ط§ط­";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating product");
-                ModelState.AddModelError("", "حدث خطأ أثناء الحفظ");
+                ModelState.AddModelError("", "ط­ط¯ط« ط®ط·ط£ ط£ط«ظ†ط§ط، ط§ظ„ط­ظپط¸");
             }
         }
         ViewBag.Categories = new SelectList(await _context.Categories.Where(c => c.IsActive).ToListAsync(), "Id", "Name");
@@ -131,17 +131,17 @@ public class ProductsController : Controller
         {
             try
             {
-                product.UpdatedAt = DateTime.Now;
+                product.UpdatedAt = DateTime.UtcNow;
                 product.ImagePath = await SaveImageAsync(imageFile, product.ImagePath);
                 _products.Update(product);
                 await _products.SaveChangesAsync();
-                TempData["Success"] = "تم تعديل المنتج بنجاح";
+                TempData["Success"] = "طھظ… طھط¹ط¯ظٹظ„ ط§ظ„ظ…ظ†طھط¬ ط¨ظ†ط¬ط§ط­";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error editing product {Id}", id);
-                ModelState.AddModelError("", "حدث خطأ أثناء الحفظ");
+                ModelState.AddModelError("", "ط­ط¯ط« ط®ط·ط£ ط£ط«ظ†ط§ط، ط§ظ„ط­ظپط¸");
             }
         }
         ViewBag.Categories = new SelectList(await _context.Categories.Where(c => c.IsActive).ToListAsync(), "Id", "Name", product.CategoryId);
@@ -159,7 +159,7 @@ public class ProductsController : Controller
         product.IsActive = false;
         _products.Update(product);
         await _products.SaveChangesAsync();
-        TempData["Success"] = "تم حذف المنتج بنجاح";
+        TempData["Success"] = "طھظ… ط­ط°ظپ ط§ظ„ظ…ظ†طھط¬ ط¨ظ†ط¬ط§ط­";
         return RedirectToAction(nameof(Index));
     }
 
@@ -185,3 +185,4 @@ public class ProductsController : Controller
         return Json(products.Select(p => new { p.Id, p.Name, p.SKU, p.SalePrice, p.PurchasePrice, p.CurrentStock, p.Unit, p.MinStockLevel, p.Brand, p.PiecesPerUnit, p.LitersPerPiece }));
     }
 }
+

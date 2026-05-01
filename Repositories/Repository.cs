@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using OilShopManagement.Data;
 using System.Linq.Expressions;
 
@@ -42,3 +42,4 @@ public class Repository<T> : IRepository<T> where T : class
     public virtual async Task<int> CountAsync(Expression<Func<T, bool>> predicate) =>
         await _dbSet.CountAsync(predicate);
 }
+

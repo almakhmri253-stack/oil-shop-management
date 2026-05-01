@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -65,7 +65,7 @@ public class InvoicesController : Controller
             .Include(i => i.Customer)
             .Include(i => i.Items)
             .FirstOrDefaultAsync(i => i.InvoiceNumber == number);
-        if (invoice == null) return NotFound(new { message = "الفاتورة غير موجودة" });
+        if (invoice == null) return NotFound(new { message = "ط§ظ„ظپط§طھظˆط±ط© ط؛ظٹط± ظ…ظˆط¬ظˆط¯ط©" });
         return Json(new
         {
             id = invoice.Id,
@@ -112,7 +112,7 @@ public class InvoicesController : Controller
     public async Task<IActionResult> Create([FromBody] InvoiceCreateViewModel vm)
     {
         if (!vm.Items.Any() && (vm.ManualSubTotal == null || vm.ManualSubTotal <= 0))
-            return BadRequest(new { message = "يجب إضافة منتج أو إدخال المبلغ" });
+            return BadRequest(new { message = "ظٹط¬ط¨ ط¥ط¶ط§ظپط© ظ…ظ†طھط¬ ط£ظˆ ط¥ط¯ط®ط§ظ„ ط§ظ„ظ…ط¨ظ„ط؛" });
 
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
@@ -128,17 +128,17 @@ public class InvoicesController : Controller
                 Notes = vm.Notes,
                 Status = InvoiceStatus.Completed,
                 CreatedByUserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.UtcNow
             };
 
             decimal subTotal = 0;
             foreach (var item in vm.Items)
             {
                 var product = await _products.GetByIdAsync(item.ProductId);
-                if (product == null) return BadRequest(new { message = $"المنتج غير موجود" });
+                if (product == null) return BadRequest(new { message = $"ط§ظ„ظ…ظ†طھط¬ ط؛ظٹط± ظ…ظˆط¬ظˆط¯" });
 
                 // For carton products: item.Quantity is in pieces, stock is in cartons
-                bool isCarton = (product.Unit == "كرتون" || product.Unit == "Carton")
+                bool isCarton = (product.Unit == "ظƒط±طھظˆظ†" || product.Unit == "Carton")
                                 && product.PiecesPerUnit.HasValue && product.PiecesPerUnit > 0;
                 int cartonsNeeded = isCarton
                     ? (int)Math.Ceiling((double)item.Quantity / product.PiecesPerUnit!.Value)
@@ -149,7 +149,7 @@ public class InvoicesController : Controller
                     var available = isCarton
                         ? product.CurrentStock * product.PiecesPerUnit!.Value
                         : product.CurrentStock;
-                    return BadRequest(new { message = $"الكمية المتوفرة من {product.Name} هي {available} فقط" });
+                    return BadRequest(new { message = $"ط§ظ„ظƒظ…ظٹط© ط§ظ„ظ…طھظˆظپط±ط© ظ…ظ† {product.Name} ظ‡ظٹ {available} ظپظ‚ط·" });
                 }
 
                 var invoiceItem = new InvoiceItem
@@ -176,7 +176,7 @@ public class InvoicesController : Controller
                     QuantityAfter = product.CurrentStock,
                     UnitPrice = invoiceItem.UnitPrice,
                     UserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
-                    CreatedAt = DateTime.Now
+                    CreatedAt = DateTime.UtcNow
                 });
                 _context.Products.Update(product);
             }
@@ -197,7 +197,7 @@ public class InvoicesController : Controller
         {
             await transaction.RollbackAsync();
             _logger.LogError(ex, "Error creating invoice");
-            return StatusCode(500, new { message = "حدث خطأ أثناء إنشاء الفاتورة" });
+            return StatusCode(500, new { message = "ط­ط¯ط« ط®ط·ط£ ط£ط«ظ†ط§ط، ط¥ظ†ط´ط§ط، ط§ظ„ظپط§طھظˆط±ط©" });
         }
     }
 
@@ -210,7 +210,7 @@ public class InvoicesController : Controller
         if (invoice == null) return NotFound();
         if (invoice.Status == InvoiceStatus.Cancelled)
         {
-            TempData["Error"] = "الفاتورة ملغاة بالفعل";
+            TempData["Error"] = "ط§ظ„ظپط§طھظˆط±ط© ظ…ظ„ط؛ط§ط© ط¨ط§ظ„ظپط¹ظ„";
             return RedirectToAction(nameof(Details), new { id });
         }
 
@@ -232,7 +232,7 @@ public class InvoicesController : Controller
                         Quantity = item.Quantity,
                         QuantityBefore = before,
                         QuantityAfter = product.CurrentStock,
-                        Notes = $"إلغاء فاتورة {invoice.InvoiceNumber}",
+                        Notes = $"ط¥ظ„ط؛ط§ط، ظپط§طھظˆط±ط© {invoice.InvoiceNumber}",
                         InvoiceId = invoice.Id
                     });
                     _context.Products.Update(product);
@@ -241,14 +241,15 @@ public class InvoicesController : Controller
             _invoices.Update(invoice);
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
-            TempData["Success"] = "تم إلغاء الفاتورة وإعادة المخزون";
+            TempData["Success"] = "طھظ… ط¥ظ„ط؛ط§ط، ط§ظ„ظپط§طھظˆط±ط© ظˆط¥ط¹ط§ط¯ط© ط§ظ„ظ…ط®ط²ظˆظ†";
         }
         catch (Exception ex)
         {
             await transaction.RollbackAsync();
             _logger.LogError(ex, "Error cancelling invoice {Id}", id);
-            TempData["Error"] = "حدث خطأ أثناء الإلغاء";
+            TempData["Error"] = "ط­ط¯ط« ط®ط·ط£ ط£ط«ظ†ط§ط، ط§ظ„ط¥ظ„ط؛ط§ط،";
         }
         return RedirectToAction(nameof(Details), new { id });
     }
 }
+

@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace OilShopManagement.Services;
 
@@ -13,3 +13,4 @@ public class LangHelper
 
     public string T(string arabic, string english) => IsAr ? arabic : english;
 }
+

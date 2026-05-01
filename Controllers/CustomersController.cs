@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OilShopManagement.Data;
@@ -45,10 +45,10 @@ public class CustomersController : Controller
     {
         if (ModelState.IsValid)
         {
-            customer.CreatedAt = DateTime.Now;
+            customer.CreatedAt = DateTime.UtcNow;
             _context.Customers.Add(customer);
             await _context.SaveChangesAsync();
-            TempData["Success"] = "تم إضافة العميل بنجاح";
+            TempData["Success"] = "طھظ… ط¥ط¶ط§ظپط© ط§ظ„ط¹ظ…ظٹظ„ ط¨ظ†ط¬ط§ط­";
             return RedirectToAction(nameof(Index));
         }
         return View(customer);
@@ -70,7 +70,7 @@ public class CustomersController : Controller
         {
             _context.Customers.Update(customer);
             await _context.SaveChangesAsync();
-            TempData["Success"] = "تم تعديل العميل بنجاح";
+            TempData["Success"] = "طھظ… طھط¹ط¯ظٹظ„ ط§ظ„ط¹ظ…ظٹظ„ ط¨ظ†ط¬ط§ط­";
             return RedirectToAction(nameof(Index));
         }
         return View(customer);
@@ -84,7 +84,7 @@ public class CustomersController : Controller
         if (customer == null) return NotFound();
         customer.IsActive = false;
         await _context.SaveChangesAsync();
-        TempData["Success"] = "تم حذف العميل";
+        TempData["Success"] = "طھظ… ط­ط°ظپ ط§ظ„ط¹ظ…ظٹظ„";
         return RedirectToAction(nameof(Index));
     }
 
@@ -98,3 +98,4 @@ public class CustomersController : Controller
         return Json(customers);
     }
 }
+

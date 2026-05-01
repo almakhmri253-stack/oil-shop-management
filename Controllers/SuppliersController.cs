@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OilShopManagement.Data;
@@ -30,10 +30,10 @@ public class SuppliersController : Controller
     public async Task<IActionResult> Create(Supplier supplier)
     {
         if (!ModelState.IsValid) return View(supplier);
-        supplier.CreatedAt = DateTime.Now;
+        supplier.CreatedAt = DateTime.UtcNow;
         _context.Suppliers.Add(supplier);
         await _context.SaveChangesAsync();
-        TempData["Success"] = "تم إضافة المورد بنجاح";
+        TempData["Success"] = "طھظ… ط¥ط¶ط§ظپط© ط§ظ„ظ…ظˆط±ط¯ ط¨ظ†ط¬ط§ط­";
         return RedirectToAction(nameof(Index));
     }
 
@@ -52,7 +52,7 @@ public class SuppliersController : Controller
         if (!ModelState.IsValid) return View(supplier);
         _context.Suppliers.Update(supplier);
         await _context.SaveChangesAsync();
-        TempData["Success"] = "تم تعديل المورد بنجاح";
+        TempData["Success"] = "طھظ… طھط¹ط¯ظٹظ„ ط§ظ„ظ…ظˆط±ط¯ ط¨ظ†ط¬ط§ط­";
         return RedirectToAction(nameof(Index));
     }
 
@@ -64,7 +64,7 @@ public class SuppliersController : Controller
         if (supplier == null) return NotFound();
         supplier.IsActive = false;
         await _context.SaveChangesAsync();
-        TempData["Success"] = "تم حذف المورد";
+        TempData["Success"] = "طھظ… ط­ط°ظپ ط§ظ„ظ…ظˆط±ط¯";
         return RedirectToAction(nameof(Index));
     }
 
@@ -79,3 +79,4 @@ public class SuppliersController : Controller
         return Json(suppliers);
     }
 }
+

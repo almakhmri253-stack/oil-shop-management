@@ -1,3 +1,4 @@
-namespace OilShopManagement.Resources.Views.Account;
+﻿namespace OilShopManagement.Resources.Views.Account;
 
 public class LoginResources { }
+

@@ -1,4 +1,4 @@
-using OilShopManagement.Models;
+﻿using OilShopManagement.Models;
 
 namespace OilShopManagement.ViewModels;
 
@@ -19,3 +19,4 @@ public class StockReportViewModel
     public int LowStockCount { get; set; }
     public decimal TotalStockValue { get; set; }
 }
+

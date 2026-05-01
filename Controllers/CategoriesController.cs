@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OilShopManagement.Data;
@@ -24,10 +24,10 @@ public class CategoriesController : Controller
     {
         if (ModelState.IsValid)
         {
-            category.CreatedAt = DateTime.Now;
+            category.CreatedAt = DateTime.UtcNow;
             _context.Categories.Add(category);
             await _context.SaveChangesAsync();
-            TempData["Success"] = "تم إضافة التصنيف بنجاح";
+            TempData["Success"] = "طھظ… ط¥ط¶ط§ظپط© ط§ظ„طھطµظ†ظٹظپ ط¨ظ†ط¬ط§ط­";
             return RedirectToAction(nameof(Index));
         }
         return View(category);
@@ -49,7 +49,7 @@ public class CategoriesController : Controller
         {
             _context.Categories.Update(category);
             await _context.SaveChangesAsync();
-            TempData["Success"] = "تم تعديل التصنيف بنجاح";
+            TempData["Success"] = "طھظ… طھط¹ط¯ظٹظ„ ط§ظ„طھطµظ†ظٹظپ ط¨ظ†ط¬ط§ط­";
             return RedirectToAction(nameof(Index));
         }
         return View(category);
@@ -63,7 +63,8 @@ public class CategoriesController : Controller
         if (cat == null) return NotFound();
         cat.IsActive = false;
         await _context.SaveChangesAsync();
-        TempData["Success"] = "تم حذف التصنيف";
+        TempData["Success"] = "طھظ… ط­ط°ظپ ط§ظ„طھطµظ†ظٹظپ";
         return RedirectToAction(nameof(Index));
     }
 }
+

@@ -1,4 +1,4 @@
-using OilShopManagement.Models;
+﻿using OilShopManagement.Models;
 
 namespace OilShopManagement.Repositories;
 
@@ -10,3 +10,4 @@ public interface IProductRepository : IRepository<Product>
     Task<IEnumerable<Product>> SearchAsync(string searchTerm);
     Task<IEnumerable<Product>> GetByCategoryAsync(int categoryId);
 }
+

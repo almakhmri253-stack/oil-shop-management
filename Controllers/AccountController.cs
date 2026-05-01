@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
@@ -38,21 +38,21 @@ public class AccountController : Controller
         var user = await _userManager.FindByEmailAsync(model.Email);
         if (user == null || !user.IsActive)
         {
-            ModelState.AddModelError("", "البريد الإلكتروني أو كلمة المرور غير صحيحة");
+            ModelState.AddModelError("", "ط§ظ„ط¨ط±ظٹط¯ ط§ظ„ط¥ظ„ظƒطھط±ظˆظ†ظٹ ط£ظˆ ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ط؛ظٹط± طµط­ظٹط­ط©");
             return View(model);
         }
 
         var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false);
         if (result.Succeeded)
         {
-            user.LastLoginAt = DateTime.Now;
+            user.LastLoginAt = DateTime.UtcNow;
             await _userManager.UpdateAsync(user);
 
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                 return Redirect(returnUrl);
             return RedirectToAction("Index", "Dashboard");
         }
-        ModelState.AddModelError("", "البريد الإلكتروني أو كلمة المرور غير صحيحة");
+        ModelState.AddModelError("", "ط§ظ„ط¨ط±ظٹط¯ ط§ظ„ط¥ظ„ظƒطھط±ظˆظ†ظٹ ط£ظˆ ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ط؛ظٹط± طµط­ظٹط­ط©");
         return View(model);
     }
 
@@ -78,16 +78,17 @@ public class AccountController : Controller
 
 public class LoginViewModel
 {
-    [Required(ErrorMessage = "البريد الإلكتروني مطلوب")]
+    [Required(ErrorMessage = "ط§ظ„ط¨ط±ظٹط¯ ط§ظ„ط¥ظ„ظƒطھط±ظˆظ†ظٹ ظ…ط·ظ„ظˆط¨")]
     [EmailAddress]
-    [Display(Name = "البريد الإلكتروني")]
+    [Display(Name = "ط§ظ„ط¨ط±ظٹط¯ ط§ظ„ط¥ظ„ظƒطھط±ظˆظ†ظٹ")]
     public string Email { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "كلمة المرور مطلوبة")]
+    [Required(ErrorMessage = "ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ظ…ط·ظ„ظˆط¨ط©")]
     [DataType(DataType.Password)]
-    [Display(Name = "كلمة المرور")]
+    [Display(Name = "ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط±")]
     public string Password { get; set; } = string.Empty;
 
-    [Display(Name = "تذكرني")]
+    [Display(Name = "طھط°ظƒط±ظ†ظٹ")]
     public bool RememberMe { get; set; }
 }
+

@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 
 namespace OilShopManagement.Authorization;
@@ -12,14 +12,14 @@ public class PermissionAuthorizationHandler : AuthorizationHandler<PermissionReq
 {
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionRequirement requirement)
     {
-        // Admin يملك كل الصلاحيات تلقائياً
+        // Admin ظٹظ…ظ„ظƒ ظƒظ„ ط§ظ„طµظ„ط§ط­ظٹط§طھ طھظ„ظ‚ط§ط¦ظٹط§ظ‹
         if (context.User.IsInRole("Admin"))
         {
             context.Succeed(requirement);
             return Task.CompletedTask;
         }
 
-        // تحقق من الـ Claims
+        // طھط­ظ‚ظ‚ ظ…ظ† ط§ظ„ظ€ Claims
         if (context.User.HasClaim(c => c.Type == "Permission" && c.Value == requirement.Permission))
             context.Succeed(requirement);
 
@@ -31,3 +31,4 @@ public static class PolicyNames
 {
     public static string For(string permission) => $"Permission:{permission}";
 }
+

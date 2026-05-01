@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using OilShopManagement.Data;
 using OilShopManagement.Models;
 
@@ -17,3 +17,4 @@ public class StockRepository : Repository<StockTransaction>, IStockRepository
         await _dbSet.Include(st => st.Product)
             .OrderByDescending(st => st.CreatedAt).Take(count).ToListAsync();
 }
+

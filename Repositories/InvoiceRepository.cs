@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using OilShopManagement.Data;
 using OilShopManagement.Models;
 
@@ -28,7 +28,7 @@ public class InvoiceRepository : Repository<Invoice>, IInvoiceRepository
 
     public async Task<string> GenerateInvoiceNumberAsync()
     {
-        var today = DateTime.Now;
+        var today = DateTime.UtcNow;
         var prefix = $"INV-{today:yyyyMM}-";
         var lastInvoice = await _dbSet
             .Where(i => i.InvoiceNumber.StartsWith(prefix))
@@ -55,3 +55,4 @@ public class InvoiceRepository : Repository<Invoice>, IInvoiceRepository
             .Where(ii => ii.Invoice!.InvoiceDate >= from && ii.Invoice.InvoiceDate <= to && ii.Invoice.Status == InvoiceStatus.Completed)
             .SumAsync(ii => (ii.UnitPrice - ii.PurchasePrice) * ii.Quantity);
 }
+

@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OilShopManagement.Data;
@@ -67,7 +67,7 @@ public class PurchasesController : Controller
             .Include(p => p.Supplier)
             .Include(p => p.Items)
             .FirstOrDefaultAsync(p => p.PurchaseNumber == number);
-        if (purchase == null) return NotFound(new { message = "فاتورة الشراء غير موجودة" });
+        if (purchase == null) return NotFound(new { message = "ظپط§طھظˆط±ط© ط§ظ„ط´ط±ط§ط، ط؛ظٹط± ظ…ظˆط¬ظˆط¯ط©" });
         return Json(new
         {
             id = purchase.Id,
@@ -109,7 +109,7 @@ public class PurchasesController : Controller
     public async Task<IActionResult> Create([FromBody] PurchaseCreateViewModel vm)
     {
         if (!vm.Items.Any() && (vm.ManualSubTotal == null || vm.ManualSubTotal <= 0))
-            return BadRequest(new { message = "يجب إضافة منتج أو إدخال المبلغ" });
+            return BadRequest(new { message = "ظٹط¬ط¨ ط¥ط¶ط§ظپط© ظ…ظ†طھط¬ ط£ظˆ ط¥ط¯ط®ط§ظ„ ط§ظ„ظ…ط¨ظ„ط؛" });
 
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
@@ -125,14 +125,14 @@ public class PurchasesController : Controller
                 Notes = vm.Notes,
                 Status = PurchaseStatus.Completed,
                 CreatedByUserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.UtcNow
             };
 
             decimal subTotal = 0;
             foreach (var item in vm.Items)
             {
                 var product = await _context.Products.FindAsync(item.ProductId);
-                if (product == null) return BadRequest(new { message = "المنتج غير موجود" });
+                if (product == null) return BadRequest(new { message = "ط§ظ„ظ…ظ†طھط¬ ط؛ظٹط± ظ…ظˆط¬ظˆط¯" });
 
                 var purchaseItem = new PurchaseItem
                 {
@@ -165,7 +165,7 @@ public class PurchasesController : Controller
                     QuantityAfter = product.CurrentStock,
                     UnitPrice = item.UnitPrice,
                     UserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
-                    CreatedAt = DateTime.Now
+                    CreatedAt = DateTime.UtcNow
                 });
                 _context.Products.Update(product);
             }
@@ -186,7 +186,7 @@ public class PurchasesController : Controller
         {
             await transaction.RollbackAsync();
             _logger.LogError(ex, "Error creating purchase");
-            return StatusCode(500, new { message = "حدث خطأ أثناء إنشاء فاتورة الشراء" });
+            return StatusCode(500, new { message = "ط­ط¯ط« ط®ط·ط£ ط£ط«ظ†ط§ط، ط¥ظ†ط´ط§ط، ظپط§طھظˆط±ط© ط§ظ„ط´ط±ط§ط،" });
         }
     }
 
@@ -201,7 +201,7 @@ public class PurchasesController : Controller
         if (purchase == null) return NotFound();
         if (purchase.Status == PurchaseStatus.Cancelled)
         {
-            TempData["Error"] = "فاتورة الشراء ملغاة بالفعل";
+            TempData["Error"] = "ظپط§طھظˆط±ط© ط§ظ„ط´ط±ط§ط، ظ…ظ„ط؛ط§ط© ط¨ط§ظ„ظپط¹ظ„";
             return RedirectToAction(nameof(Details), new { id });
         }
 
@@ -223,8 +223,8 @@ public class PurchasesController : Controller
                         Quantity = item.Quantity,
                         QuantityBefore = before,
                         QuantityAfter = product.CurrentStock,
-                        Notes = $"إلغاء فاتورة شراء {purchase.PurchaseNumber}",
-                        CreatedAt = DateTime.Now
+                        Notes = $"ط¥ظ„ط؛ط§ط، ظپط§طھظˆط±ط© ط´ط±ط§ط، {purchase.PurchaseNumber}",
+                        CreatedAt = DateTime.UtcNow
                     });
                     _context.Products.Update(product);
                 }
@@ -232,13 +232,13 @@ public class PurchasesController : Controller
             _context.Purchases.Update(purchase);
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
-            TempData["Success"] = "تم إلغاء فاتورة الشراء وتعديل المخزون";
+            TempData["Success"] = "طھظ… ط¥ظ„ط؛ط§ط، ظپط§طھظˆط±ط© ط§ظ„ط´ط±ط§ط، ظˆطھط¹ط¯ظٹظ„ ط§ظ„ظ…ط®ط²ظˆظ†";
         }
         catch (Exception ex)
         {
             await transaction.RollbackAsync();
             _logger.LogError(ex, "Error cancelling purchase {Id}", id);
-            TempData["Error"] = "حدث خطأ أثناء الإلغاء";
+            TempData["Error"] = "ط­ط¯ط« ط®ط·ط£ ط£ط«ظ†ط§ط، ط§ظ„ط¥ظ„ط؛ط§ط،";
         }
         return RedirectToAction(nameof(Details), new { id });
     }
@@ -250,3 +250,4 @@ public class PurchasesController : Controller
         return $"PUR-{today:yyyyMMdd}-{(count + 1):D4}";
     }
 }
+

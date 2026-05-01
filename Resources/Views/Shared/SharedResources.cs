@@ -1,3 +1,4 @@
-namespace OilShopManagement.Resources.Views.Shared;
+﻿namespace OilShopManagement.Resources.Views.Shared;
 
 public class SharedResources { }
+

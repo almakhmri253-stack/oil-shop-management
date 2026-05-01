@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using OilShopManagement.Models;
 
@@ -118,10 +118,11 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
         var seedDate = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         builder.Entity<Category>().HasData(
-            new Category { Id = 1, Name = "زيت محرك", Description = "جميع أنواع زيوت المحرك", IsActive = true, CreatedAt = seedDate },
-            new Category { Id = 2, Name = "زيت قير", Description = "زيوت ناقل الحركة", IsActive = true, CreatedAt = seedDate },
-            new Category { Id = 3, Name = "فلاتر", Description = "فلاتر الزيت والهواء", IsActive = true, CreatedAt = seedDate },
-            new Category { Id = 4, Name = "إضافات", Description = "إضافات ومواد تشحيم", IsActive = true, CreatedAt = seedDate }
+            new Category { Id = 1, Name = "ط²ظٹطھ ظ…ط­ط±ظƒ", Description = "ط¬ظ…ظٹط¹ ط£ظ†ظˆط§ط¹ ط²ظٹظˆطھ ط§ظ„ظ…ط­ط±ظƒ", IsActive = true, CreatedAt = seedDate },
+            new Category { Id = 2, Name = "ط²ظٹطھ ظ‚ظٹط±", Description = "ط²ظٹظˆطھ ظ†ط§ظ‚ظ„ ط§ظ„ط­ط±ظƒط©", IsActive = true, CreatedAt = seedDate },
+            new Category { Id = 3, Name = "ظپظ„ط§طھط±", Description = "ظپظ„ط§طھط± ط§ظ„ط²ظٹطھ ظˆط§ظ„ظ‡ظˆط§ط،", IsActive = true, CreatedAt = seedDate },
+            new Category { Id = 4, Name = "ط¥ط¶ط§ظپط§طھ", Description = "ط¥ط¶ط§ظپط§طھ ظˆظ…ظˆط§ط¯ طھط´ط­ظٹظ…", IsActive = true, CreatedAt = seedDate }
         );
     }
 }
+
