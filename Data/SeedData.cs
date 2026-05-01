@@ -23,7 +23,7 @@ public static class SeedData
             {
                 UserName = "admin@oilshop.com",
                 Email = "admin@oilshop.com",
-                FullName = "ظ…ط¯ظٹط± ط§ظ„ظ†ط¸ط§ظ…",
+                FullName = "مدير النظام",
                 IsActive = true,
                 EmailConfirmed = true,
                 CreatedAt = DateTime.UtcNow
