@@ -1,5 +1,3 @@
-AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
@@ -11,6 +9,8 @@ using OilShopManagement.Repositories;
 using OilShopManagement.Services;
 using Serilog;
 using System.Globalization;
+
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
