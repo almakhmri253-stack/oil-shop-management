@@ -22,8 +22,8 @@ public class PurchaseReturnsController : Controller
 
     public async Task<IActionResult> Index(DateTime? from, DateTime? to)
     {
-        var fromDate = from ?? DateTime.Today.AddDays(-30);
-        var toDate = (to ?? DateTime.Today).AddDays(1);
+        var fromDate = from ?? DateTime.UtcNow.Date.AddDays(-30);
+        var toDate = (to ?? DateTime.UtcNow.Date).AddDays(1);
 
         var returns = await _context.PurchaseReturns
             .Include(r => r.Supplier)
@@ -136,9 +136,10 @@ public class PurchaseReturnsController : Controller
 
     private async Task<string> GenerateReturnNumberAsync()
     {
-        var today = DateTime.Today;
+        var today = DateTime.UtcNow.Date;
         var count = await _context.PurchaseReturns.CountAsync(r => r.ReturnDate.Date == today);
         return $"PR-{today:yyyyMMdd}-{(count + 1):D4}";
     }
 }
+
 

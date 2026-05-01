@@ -29,8 +29,8 @@ public class InvoicesController : Controller
 
     public async Task<IActionResult> Index(string? search, DateTime? from, DateTime? to)
     {
-        var fromDate = from ?? DateTime.Today.AddDays(-30);
-        var toDate = (to ?? DateTime.Today).AddDays(1);
+        var fromDate = from ?? DateTime.UtcNow.Date.AddDays(-30);
+        var toDate = (to ?? DateTime.UtcNow.Date).AddDays(1);
 
         var invoices = await _invoices.GetByDateRangeAsync(fromDate, toDate);
 
@@ -252,4 +252,5 @@ public class InvoicesController : Controller
         return RedirectToAction(nameof(Details), new { id });
     }
 }
+
 

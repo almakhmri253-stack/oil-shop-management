@@ -61,3 +61,4 @@ public class Purchase
     public ICollection<PurchaseReturn> Returns { get; set; } = new List<PurchaseReturn>();
 }
 
+

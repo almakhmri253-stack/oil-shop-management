@@ -39,3 +39,4 @@ public class Customer
     public ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
 }
 
+

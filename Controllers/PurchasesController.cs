@@ -22,8 +22,8 @@ public class PurchasesController : Controller
 
     public async Task<IActionResult> Index(string? search, DateTime? from, DateTime? to)
     {
-        var fromDate = from ?? DateTime.Today.AddDays(-30);
-        var toDate = (to ?? DateTime.Today).AddDays(1);
+        var fromDate = from ?? DateTime.UtcNow.Date.AddDays(-30);
+        var toDate = (to ?? DateTime.UtcNow.Date).AddDays(1);
 
         var query = _context.Purchases
             .Include(p => p.Supplier)
@@ -245,9 +245,10 @@ public class PurchasesController : Controller
 
     private async Task<string> GeneratePurchaseNumberAsync()
     {
-        var today = DateTime.Today;
+        var today = DateTime.UtcNow.Date;
         var count = await _context.Purchases.CountAsync(p => p.PurchaseDate.Date == today);
         return $"PUR-{today:yyyyMMdd}-{(count + 1):D4}";
     }
 }
+
 

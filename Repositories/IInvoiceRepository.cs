@@ -13,3 +13,4 @@ public interface IInvoiceRepository : IRepository<Invoice>
     Task<decimal> GetTotalProfitAsync(DateTime from, DateTime to);
 }
 
+

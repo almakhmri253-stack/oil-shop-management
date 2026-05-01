@@ -89,3 +89,4 @@ public static class Permissions
 public record PermissionGroup(string Label, string Icon, string Color, PermissionItem[] Items);
 public record PermissionItem(string Value, string Label);
 
+

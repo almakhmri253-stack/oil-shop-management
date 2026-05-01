@@ -8,3 +8,4 @@ public interface IStockRepository : IRepository<StockTransaction>
     Task<IEnumerable<StockTransaction>> GetRecentAsync(int count = 20);
 }
 
+

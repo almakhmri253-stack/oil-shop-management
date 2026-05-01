@@ -27,8 +27,9 @@ public class DashboardController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var today = DateTime.Today;
-        var monthStart = new DateTime(today.Year, today.Month, 1);
+        var now = DateTime.UtcNow;
+        var today = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0, DateTimeKind.Utc);
+        var monthStart = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
         var tomorrow = today.AddDays(1);
 
         var vm = new DashboardViewModel
@@ -59,4 +60,5 @@ public class DashboardController : Controller
         return View(vm);
     }
 }
+
 

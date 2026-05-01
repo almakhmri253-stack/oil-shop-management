@@ -18,3 +18,4 @@ public class StockRepository : Repository<StockTransaction>, IStockRepository
             .OrderByDescending(st => st.CreatedAt).Take(count).ToListAsync();
 }
 
+

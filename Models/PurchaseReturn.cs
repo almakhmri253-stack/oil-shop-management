@@ -35,3 +35,4 @@ public class PurchaseReturn
     public ICollection<PurchaseReturnItem> Items { get; set; } = new List<PurchaseReturnItem>();
 }
 
+

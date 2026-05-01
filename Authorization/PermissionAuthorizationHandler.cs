@@ -32,3 +32,4 @@ public static class PolicyNames
     public static string For(string permission) => $"Permission:{permission}";
 }
 
+

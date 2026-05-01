@@ -56,3 +56,4 @@ public class InvoiceRepository : Repository<Invoice>, IInvoiceRepository
             .SumAsync(ii => (ii.UnitPrice - ii.PurchasePrice) * ii.Quantity);
 }
 
+

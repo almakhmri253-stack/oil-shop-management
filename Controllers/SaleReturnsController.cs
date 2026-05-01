@@ -22,8 +22,8 @@ public class SaleReturnsController : Controller
 
     public async Task<IActionResult> Index(DateTime? from, DateTime? to, string? search)
     {
-        var fromDate = from ?? DateTime.Today.AddDays(-30);
-        var toDate = (to ?? DateTime.Today).AddDays(1);
+        var fromDate = from ?? DateTime.UtcNow.Date.AddDays(-30);
+        var toDate = (to ?? DateTime.UtcNow.Date).AddDays(1);
 
         var query = _context.SaleReturns
             .Include(r => r.Customer)
@@ -139,9 +139,10 @@ public class SaleReturnsController : Controller
 
     private async Task<string> GenerateReturnNumberAsync()
     {
-        var today = DateTime.Today;
+        var today = DateTime.UtcNow.Date;
         var count = await _context.SaleReturns.CountAsync(r => r.ReturnDate.Date == today);
         return $"SR-{today:yyyyMMdd}-{(count + 1):D4}";
     }
 }
+
 

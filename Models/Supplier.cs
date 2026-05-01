@@ -37,3 +37,4 @@ public class Supplier
     public ICollection<PurchaseReturn> PurchaseReturns { get; set; } = new List<PurchaseReturn>();
 }
 
+

@@ -23,8 +23,8 @@ public class ReportsController : Controller
 
     public async Task<IActionResult> Sales(DateTime? from, DateTime? to)
     {
-        var fromDate = from ?? DateTime.Today.AddDays(-30);
-        var toDate = (to ?? DateTime.Today).AddDays(1);
+        var fromDate = from ?? DateTime.UtcNow.Date.AddDays(-30);
+        var toDate = (to ?? DateTime.UtcNow.Date).AddDays(1);
 
         var vm = new SalesReportViewModel
         {
@@ -53,8 +53,8 @@ public class ReportsController : Controller
 
     public async Task<IActionResult> TopProducts(DateTime? from, DateTime? to)
     {
-        var fromDate = from ?? DateTime.Today.AddMonths(-1);
-        var toDate = (to ?? DateTime.Today).AddDays(1);
+        var fromDate = from ?? DateTime.UtcNow.Date.AddMonths(-1);
+        var toDate = (to ?? DateTime.UtcNow.Date).AddDays(1);
 
         var topProducts = await _context.InvoiceItems
             .Include(ii => ii.Invoice)
@@ -79,4 +79,5 @@ public class ReportsController : Controller
         return View(topProducts);
     }
 }
+
 

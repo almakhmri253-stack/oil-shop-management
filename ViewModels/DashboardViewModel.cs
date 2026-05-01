@@ -23,3 +23,4 @@ public class DashboardViewModel
     public List<decimal> ChartProfitData { get; set; } = [];
 }
 
+

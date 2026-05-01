@@ -87,3 +87,4 @@ public class Product
     public decimal ProfitMargin => SalePrice > 0 ? ((SalePrice - PurchasePrice) / SalePrice) * 100 : 0;
 }
 
+

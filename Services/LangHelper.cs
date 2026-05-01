@@ -14,3 +14,4 @@ public class LangHelper
     public string T(string arabic, string english) => IsAr ? arabic : english;
 }
 
+

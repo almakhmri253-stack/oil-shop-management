@@ -19,3 +19,4 @@ public class ApplicationUser : IdentityUser
     public string? PreferredLanguage { get; set; }
 }
 
+
