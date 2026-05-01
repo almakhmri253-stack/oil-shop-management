@@ -23,7 +23,7 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           FILENAME="backup-$(date +%Y-%m-%d).sql"
-          pg_dump "$DATABASE_URL" > "$FILENAME"
+          /usr/lib/postgresql/17/bin/pg_dump "$DATABASE_URL" > "$FILENAME"
           echo "FILENAME=$FILENAME" >> $GITHUB_ENV
 
       - name: Upload backup as artifact
