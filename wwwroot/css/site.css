@@ -392,6 +392,18 @@ body {
     }
 }
 
+/* ==================== Mobile Navbar ==================== */
+@media (max-width: 480px) {
+    .top-navbar { padding: 0 0.5rem; gap: 0.4rem; }
+    .top-navbar .btn-group { display: none !important; }
+    .top-navbar .btn-success { display: none !important; }
+    .top-navbar .dropdown .btn span { display: none; }
+    .top-navbar .dropdown .btn i { margin: 0 !important; }
+    .page-content { padding: 0.5rem; }
+    .stat-card .stat-value { font-size: 1.3rem; }
+    h4.fw-bold { font-size: 1.1rem; }
+}
+
 /* ==================== Utilities ==================== */
 .cursor-pointer { cursor: pointer; }
 .text-truncate-2 {
