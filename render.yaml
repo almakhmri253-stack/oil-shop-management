@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: oil-shop-management
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    branch: master
+    plan: free
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: DATABASE_URL
+        sync: false
