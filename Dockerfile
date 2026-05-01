@@ -10,4 +10,6 @@ RUN dotnet publish -c Release -o /app/publish
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
 COPY --from=build /app/publish .
+ENV PORT=7860
+EXPOSE 7860
 ENTRYPOINT ["dotnet", "OilShopManagement.dll"]
