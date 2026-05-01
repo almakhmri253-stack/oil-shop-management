@@ -25,12 +25,13 @@ try
     string connStr;
     if (!string.IsNullOrEmpty(databaseUrl))
     {
-        var uri = new Uri(databaseUrl);
-        var ui  = uri.UserInfo.Split(':', 2);
-        connStr = $"Host={uri.Host};Port={uri.Port};" +
-                  $"Database={uri.AbsolutePath.TrimStart('/')};" +
-                  $"Username={ui[0]};Password={Uri.UnescapeDataString(ui[1])};" +
-                  $"SSL Mode=Require;Trust Server Certificate=true";
+        var uri   = new Uri(databaseUrl);
+        var ui    = uri.UserInfo.Split(':', 2);
+        var dbPort = uri.Port > 0 ? uri.Port : 5432;
+        var dbName = uri.AbsolutePath.TrimStart('/').Split('?')[0];
+        connStr   = $"Host={uri.Host};Port={dbPort};Database={dbName};" +
+                    $"Username={ui[0]};Password={Uri.UnescapeDataString(ui[1])};" +
+                    $"SSL Mode=Require;Trust Server Certificate=true";
     }
     else
     {
