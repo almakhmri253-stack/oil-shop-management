@@ -1,0 +1,132 @@
+@model OilShopManagement.Models.Purchase
+@{
+    ViewData["Title"] = $"تفاصيل فاتورة الشراء";
+}
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <h4 class="fw-bold mb-0">فاتورة شراء: <span class="text-success">@Model.PurchaseNumber</span></h4>
+    <div class="d-flex gap-2">
+        <a href="/Purchases/Print/@Model.Id" target="_blank" class="btn btn-outline-success rounded-pill btn-sm">
+            <i class="bi bi-printer me-1"></i>طباعة
+        </a>
+        @if (Model.Status == OilShopManagement.Models.PurchaseStatus.Completed)
+        {
+            <a href="/PurchaseReturns/Create?purchaseId=@Model.Id" class="btn btn-outline-warning rounded-pill btn-sm">
+                <i class="bi bi-arrow-return-right me-1"></i>مرتجع
+            </a>
+        }
+        @if (Model.Status == OilShopManagement.Models.PurchaseStatus.Completed && User.IsInRole("Admin"))
+        {
+            <form asp-action="Cancel" asp-route-id="@Model.Id" method="post"
+                onsubmit="return confirm('هل تريد إلغاء هذه الفاتورة وعكس المخزون؟')">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-outline-danger rounded-pill btn-sm">
+                    <i class="bi bi-x-circle me-1"></i>إلغاء الفاتورة
+                </button>
+            </form>
+        }
+        <a href="/Purchases" class="btn btn-outline-secondary rounded-pill btn-sm">
+            <i class="bi bi-arrow-right me-1"></i>العودة
+        </a>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header fw-bold">المنتجات</div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>المنتج</th>
+                            <th class="text-center">الكمية</th>
+                            <th class="text-end">سعر الوحدة</th>
+                            <th class="text-end">الإجمالي</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@item.ProductName</td>
+                                <td class="text-center">@item.Quantity</td>
+                                <td class="text-end">@item.UnitPrice.ToString("N3")</td>
+                                <td class="text-end fw-semibold">@item.Total.ToString("N3")</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot class="table-light">
+                        <tr>
+                            <td colspan="3" class="text-end fw-semibold">الإجمالي قبل الضريبة</td>
+                            <td class="text-end fw-semibold">@Model.SubTotal.ToString("N3")</td>
+                        </tr>
+                        @if (Model.TaxRate > 0)
+                        {
+                            <tr>
+                                <td colspan="3" class="text-end fw-semibold">الضريبة (@Model.TaxRate%)</td>
+                                <td class="text-end fw-semibold">@Model.TaxAmount.ToString("N3")</td>
+                            </tr>
+                        }
+                        @if (Model.Discount > 0)
+                        {
+                            <tr>
+                                <td colspan="3" class="text-end fw-semibold text-success">خصم</td>
+                                <td class="text-end fw-semibold text-success">-@Model.Discount.ToString("N3")</td>
+                            </tr>
+                        }
+                        <tr class="table-success">
+                            <td colspan="3" class="text-end fw-bold">الإجمالي النهائي</td>
+                            <td class="text-end fw-bold fs-5">@Model.TotalAmount.ToString("N3") ر.ع.</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-header fw-bold">معلومات الفاتورة</div>
+            <div class="card-body">
+                <dl class="row mb-0 small">
+                    <dt class="col-5 text-muted">الحالة</dt>
+                    <dd class="col-7">
+                        @if (Model.Status == OilShopManagement.Models.PurchaseStatus.Completed)
+                        { <span class="badge bg-success">مكتملة</span> }
+                        else if (Model.Status == OilShopManagement.Models.PurchaseStatus.Cancelled)
+                        { <span class="badge bg-danger">ملغاة</span> }
+                        else { <span class="badge bg-secondary">مسودة</span> }
+                    </dd>
+                    <dt class="col-5 text-muted">التاريخ</dt>
+                    <dd class="col-7">@Model.PurchaseDate.ToString("dd/MM/yyyy HH:mm")</dd>
+                    <dt class="col-5 text-muted">الدفع</dt>
+                    <dd class="col-7">
+                        @if (Model.PaymentMethod == OilShopManagement.Models.PaymentMethod.Cash) { <text>نقداً</text> }
+                        else if (Model.PaymentMethod == OilShopManagement.Models.PaymentMethod.Card) { <text>بطاقة</text> }
+                        else { <text>تحويل</text> }
+                    </dd>
+                    @if (!string.IsNullOrEmpty(Model.Notes))
+                    {
+                        <dt class="col-5 text-muted">ملاحظات</dt>
+                        <dd class="col-7">@Model.Notes</dd>
+                    }
+                </dl>
+            </div>
+        </div>
+        @if (Model.Supplier != null)
+        {
+            <div class="card">
+                <div class="card-header fw-bold">بيانات المورد</div>
+                <div class="card-body small">
+                    <div class="fw-semibold">@Model.Supplier.Name</div>
+                    @if (!string.IsNullOrEmpty(Model.Supplier.Phone))
+                    { <div class="text-muted"><i class="bi bi-phone me-1"></i>@Model.Supplier.Phone</div> }
+                    @if (!string.IsNullOrEmpty(Model.Supplier.ContactPerson))
+                    { <div class="text-muted"><i class="bi bi-person me-1"></i>@Model.Supplier.ContactPerson</div> }
+                    @if (!string.IsNullOrEmpty(Model.Supplier.Email))
+                    { <div class="text-muted"><i class="bi bi-envelope me-1"></i>@Model.Supplier.Email</div> }
+                </div>
+            </div>
+        }
+    </div>
+</div>

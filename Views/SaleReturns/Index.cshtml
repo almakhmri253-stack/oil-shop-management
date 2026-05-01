@@ -1,0 +1,87 @@
+@model IEnumerable<OilShopManagement.Models.SaleReturn>
+@{
+    ViewData["Title"] = "مرتجعات المبيعات";
+}
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <h4 class="fw-bold mb-0"><i class="bi bi-arrow-return-left me-2 text-warning"></i>مرتجعات المبيعات</h4>
+    <a href="/SaleReturns/Create" class="btn btn-warning rounded-pill px-4">
+        <i class="bi bi-plus-circle me-2"></i>مرتجع جديد
+    </a>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold">من تاريخ</label>
+                <input type="date" name="from" class="form-control" value="@ViewBag.From">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold">إلى تاريخ</label>
+                <input type="date" name="to" class="form-control" value="@ViewBag.To">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small fw-semibold">بحث</label>
+                <input type="text" name="search" class="form-control" placeholder="رقم المرتجع أو العميل..." value="@ViewBag.Search">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-warning w-100">
+                    <i class="bi bi-search me-1"></i>بحث
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <span>النتائج: @Model.Count() مرتجع</span>
+        <span class="fw-bold text-warning">الإجمالي: @Model.Sum(r => r.TotalAmount).ToString("N3") ر.ع.</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>رقم المرتجع</th>
+                        <th>فاتورة البيع</th>
+                        <th>العميل</th>
+                        <th>التاريخ</th>
+                        <th>الإجمالي</th>
+                        <th>السبب</th>
+                        <th>إجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model)
+                    {
+                        <tr>
+                            <td><span class="badge bg-warning-subtle text-warning fw-semibold">@r.ReturnNumber</span></td>
+                            <td>
+                                @if (r.Invoice != null)
+                                { <a href="/Invoices/Details/@r.Invoice.Id" class="text-decoration-none">@r.Invoice.InvoiceNumber</a> }
+                                else { <span class="text-muted">—</span> }
+                            </td>
+                            <td>@(r.Customer?.Name ?? "—")</td>
+                            <td>@r.ReturnDate.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="fw-semibold text-warning">@r.TotalAmount.ToString("N3") ر.ع.</td>
+                            <td><span class="text-muted small">@(r.Reason ?? "—")</span></td>
+                            <td>
+                                <a href="/SaleReturns/Details/@r.Id" class="btn btn-sm btn-outline-secondary rounded-pill" title="تفاصيل">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr><td colspan="7" class="text-center text-muted py-5">
+                            <i class="bi bi-inbox fs-2 d-block mb-2"></i>لا توجد مرتجعات في هذه الفترة
+                        </td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

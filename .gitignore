@@ -1,0 +1,17 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.vscode/
+
+## Logs
+logs/
+*.log
+
+## Local secrets / dev config
+appsettings.Development.json
+
+## Uploaded product images (ephemeral on Railway)
+wwwroot/images/products/

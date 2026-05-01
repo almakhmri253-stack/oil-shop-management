@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none">
+  <!-- Gear teeth -->
+  <path d="M80 8 L88 26 L100 20 L106 37 L124 36 L122 54 L138 60 L128 74 L138 88 L122 94 L124 112 L106 111 L100 128 L88 122 L80 140 L72 122 L60 128 L54 111 L36 112 L38 94 L22 88 L32 74 L22 60 L38 54 L36 36 L54 37 L60 20 L72 26 Z" fill="#10b981"/>
+  <!-- Inner circle -->
+  <circle cx="80" cy="74" r="30" fill="#065f46"/>
+  <!-- Center hole -->
+  <circle cx="80" cy="74" r="14" fill="#f0fdf4"/>
+  <!-- Gear details - spokes -->
+  <line x1="80" y1="48" x2="80" y2="56" stroke="#10b981" stroke-width="3"/>
+  <line x1="80" y1="92" x2="80" y2="100" stroke="#10b981" stroke-width="3"/>
+  <line x1="54" y1="74" x2="62" y2="74" stroke="#10b981" stroke-width="3"/>
+  <line x1="98" y1="74" x2="106" y2="74" stroke="#10b981" stroke-width="3"/>
+  <!-- Label under gear -->
+  <rect x="20" y="148" width="120" height="8" rx="4" fill="#10b981" opacity="0"/>
+  <text x="80" y="158" text-anchor="middle" font-size="11" fill="#065f46" font-weight="bold" font-family="Arial">GEAR OIL</text>
+</svg>

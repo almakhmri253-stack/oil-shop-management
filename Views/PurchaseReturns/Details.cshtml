@@ -1,0 +1,73 @@
+@model OilShopManagement.Models.PurchaseReturn
+@{
+    ViewData["Title"] = $"مرتجع شراء {Model.ReturnNumber}";
+}
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h4 class="fw-bold mb-0"><i class="bi bi-arrow-return-right me-2 text-warning"></i>@Model.ReturnNumber</h4>
+    <a href="/PurchaseReturns" class="btn btn-outline-secondary rounded-pill btn-sm">
+        <i class="bi bi-arrow-right me-1"></i>القائمة
+    </a>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>المنتج</th>
+                                <th>الكمية المرتجعة</th>
+                                <th>سعر الوحدة</th>
+                                <th>الإجمالي</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{ int row = 1; }
+                            @foreach (var item in Model.Items)
+                            {
+                                <tr>
+                                    <td class="text-muted">@row</td>
+                                    <td class="fw-semibold">@item.ProductName</td>
+                                    <td>@item.Quantity</td>
+                                    <td>@item.UnitPrice.ToString("N3")</td>
+                                    <td class="fw-semibold text-warning">@item.Total.ToString("N3")</td>
+                                </tr>
+                                row++;
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-6 text-muted">فاتورة الشراء</dt>
+                    <dd class="col-6">
+                        @if (Model.Purchase != null)
+                        { <a href="/Purchases/Details/@Model.Purchase.Id">@Model.Purchase.PurchaseNumber</a> }
+                        else { <text>—</text> }
+                    </dd>
+                    <dt class="col-6 text-muted">المورد</dt>
+                    <dd class="col-6">@(Model.Supplier?.Name ?? "—")</dd>
+                    <dt class="col-6 text-muted">التاريخ</dt>
+                    <dd class="col-6">@Model.ReturnDate.ToString("yyyy/MM/dd HH:mm")</dd>
+                    <hr class="my-2">
+                    <dt class="col-6 fw-bold fs-6">الإجمالي</dt>
+                    <dd class="col-6 fw-bold fs-6 text-warning">@Model.TotalAmount.ToString("N3") ر.ع.</dd>
+                </dl>
+                @if (!string.IsNullOrEmpty(Model.Reason))
+                {
+                    <hr>
+                    <p class="small"><strong>السبب:</strong> @Model.Reason</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

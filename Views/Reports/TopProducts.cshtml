@@ -1,0 +1,66 @@
+@{
+    ViewData["Title"] = L.T("الأكثر مبيعاً","Top Selling");
+}
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <h4 class="fw-bold mb-0"><i class="bi bi-trophy me-2 text-warning"></i>@L.T("الأكثر مبيعاً","Top Selling Products")</h4>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small fw-semibold">@L.T("من تاريخ","From")</label>
+                <input type="date" name="from" class="form-control" value="@ViewBag.From">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small fw-semibold">@L.T("إلى تاريخ","To")</label>
+                <input type="date" name="to" class="form-control" value="@ViewBag.To">
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search me-1"></i>@L.T("عرض","Show")
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>@L.T("المنتج","Product")</th>
+                        <th class="text-center">@L.T("الكمية المباعة","Qty Sold")</th>
+                        <th class="text-end">@L.T("إجمالي الإيراد","Revenue")</th>
+                        <th class="text-end">@L.T("إجمالي الربح","Profit")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int rank = 1;
+                    }
+                    @foreach (var p in (IEnumerable<dynamic>)Model)
+                    {
+                        <tr>
+                            <td>
+                                @if (rank == 1) { <span class="badge bg-warning text-dark fs-6">🥇</span> }
+                                else if (rank == 2) { <span class="badge bg-secondary fs-6">🥈</span> }
+                                else if (rank == 3) { <span class="badge" style="background:#cd7f32;color:#fff;font-size:.9rem">🥉</span> }
+                                else { <span class="text-muted">@rank</span> }
+                            </td>
+                            <td class="fw-semibold">@p.ProductName</td>
+                            <td class="text-center">@p.TotalQuantity</td>
+                            <td class="text-end">@((decimal)p.TotalRevenue).ToString("N3") @L.T("ر.ع.","OMR")</td>
+                            <td class="text-end fw-semibold text-success">@((decimal)p.TotalProfit).ToString("N3") @L.T("ر.ع.","OMR")</td>
+                        </tr>
+                        rank++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

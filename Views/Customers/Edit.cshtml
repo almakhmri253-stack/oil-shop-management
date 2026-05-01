@@ -1,0 +1,54 @@
+@model OilShopManagement.Models.Customer
+@{
+    ViewData["Title"] = "تعديل العميل";
+}
+
+<div class="d-flex align-items-center gap-3 mb-4">
+    <a href="/Customers" class="btn btn-outline-secondary rounded-circle" style="width:38px;height:38px;padding:0;display:flex;align-items:center;justify-content:center">
+        <i class="bi bi-arrow-right"></i>
+    </a>
+    <h4 class="fw-bold mb-0">تعديل: @Model.Name</h4>
+</div>
+
+<div class="card" style="max-width:600px">
+    <div class="card-body">
+        <form asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <input asp-for="Id" type="hidden">
+            <input asp-for="CreatedAt" type="hidden">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="Name" class="form-label fw-semibold"></label>
+                    <input asp-for="Name" class="form-control">
+                    <span asp-validation-for="Name" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Phone" class="form-label fw-semibold"></label>
+                    <input asp-for="Phone" class="form-control" type="tel">
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="CarModel" class="form-label fw-semibold"></label>
+                    <input asp-for="CarModel" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="PlateNumber" class="form-label fw-semibold"></label>
+                    <input asp-for="PlateNumber" class="form-control">
+                </div>
+                <div class="col-12">
+                    <label asp-for="Address" class="form-label fw-semibold"></label>
+                    <textarea asp-for="Address" class="form-control" rows="2"></textarea>
+                </div>
+                <div class="col-12">
+                    <label asp-for="Email" class="form-label fw-semibold"></label>
+                    <input asp-for="Email" class="form-control" type="email">
+                </div>
+                <div class="col-12 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary px-4 rounded-pill">
+                        <i class="bi bi-save2 me-2"></i>حفظ التعديلات
+                    </button>
+                    <a href="/Customers" class="btn btn-outline-secondary rounded-pill">إلغاء</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,466 @@
+@model OilShopManagement.ViewModels.SaleReturnCreateViewModel
+@{
+    ViewData["Title"] = "مرتجع مبيعات جديد";
+    var invoice = ViewBag.Invoice as OilShopManagement.Models.Invoice;
+}
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h4 class="fw-bold mb-0"><i class="bi bi-arrow-return-left me-2 text-warning"></i>مرتجع مبيعات جديد</h4>
+    <a href="/SaleReturns" class="btn btn-outline-secondary rounded-pill btn-sm">
+        <i class="bi bi-arrow-right me-1"></i>مرتجعات المبيعات
+    </a>
+</div>
+
+@if (invoice != null)
+{
+    <div class="alert alert-info py-2 mb-3">
+        <i class="bi bi-info-circle me-1"></i>
+        مرتجع من فاتورة البيع: <strong>@invoice.InvoiceNumber</strong>
+        @if (invoice.Customer != null) { <text> — العميل: <strong>@invoice.Customer.Name</strong></text> }
+    </div>
+}
+
+<div class="invoice-builder">
+    <!-- Left: Items -->
+    <div>
+        <!-- Invoice Search (when no invoice pre-loaded) -->
+        @if (invoice == null)
+        {
+            <div class="card mb-3" id="invoiceSearchCard">
+                <div class="card-header fw-semibold">
+                    <i class="bi bi-receipt me-2 text-warning"></i>ابحث عن فاتورة البيع الأصلية
+                </div>
+                <div class="card-body">
+                    <div class="input-group">
+                        <input type="text" id="invoiceNumberInput" class="form-control"
+                            placeholder="مثال: INV-20260430-0001" autocomplete="off">
+                        <button class="btn btn-warning" type="button" id="loadInvoiceBtn">
+                            <i class="bi bi-search"></i> جلب الفاتورة
+                        </button>
+                    </div>
+                    <div id="invoiceSearchSuggestions" class="product-suggestions d-none mt-1"></div>
+                    <div id="invoiceInfo" class="mt-2 d-none"></div>
+                    <div id="invoiceItemsButtons" class="d-flex flex-wrap gap-2 mt-2"></div>
+                </div>
+            </div>
+        }
+
+        <div class="card mb-3">
+            <div class="card-header">
+                <i class="bi bi-search me-2 text-warning"></i>
+                @if (invoice != null) { <text>اختر المنتجات المرتجعة</text> } else { <text>بحث يدوي عن منتج</text> }
+            </div>
+            <div class="card-body">
+                @if (invoice != null)
+                {
+                    <p class="small text-muted mb-2">اضغط على منتج لإضافته:</p>
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        @foreach (var item in invoice.Items)
+                        {
+                            <button type="button" class="btn btn-outline-warning btn-sm"
+                                onclick="addItem(@item.ProductId, '@Html.Raw(item.ProductName.Replace("'", "\\'"))', @item.UnitPrice, @item.Quantity)">
+                                <i class="bi bi-plus-circle me-1"></i>@item.ProductName
+                                <span class="badge bg-warning text-dark ms-1">@item.Quantity</span>
+                            </button>
+                        }
+                    </div>
+                    <hr class="my-2">
+                }
+                <div class="product-search-box">
+                    <input type="text" id="productSearch" class="form-control form-control-lg"
+                        placeholder="ابحث باسم المنتج..." autocomplete="off">
+                    <div id="productSuggestions" class="product-suggestions d-none"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <span><i class="bi bi-list-check me-2"></i>المنتجات المرتجعة</span>
+                <span class="badge bg-warning text-dark rounded-pill" id="itemCount">0 منتج</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>المنتج</th>
+                                <th style="width:110px">الكمية</th>
+                                <th style="width:130px">السعر</th>
+                                <th style="width:130px">الإجمالي</th>
+                                <th style="width:50px"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsBody">
+                            <tr id="emptyRow">
+                                <td colspan="5" class="text-center text-muted py-5">
+                                    <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                                    اضغط على المنتج أو ابحث لإضافته
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right: Summary -->
+    <div>
+        <div class="invoice-summary card">
+            <div class="card-header fw-bold">
+                <i class="bi bi-arrow-return-left me-2 text-warning"></i>ملخص المرتجع
+            </div>
+            <div class="card-body">
+                @if (invoice == null)
+                {
+                    <!-- Customer Search when no invoice -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">العميل (اختياري)</label>
+                        <div class="input-group">
+                            <input type="text" id="customerSearch" class="form-control form-control-sm" placeholder="ابحث عن العميل...">
+                            <button class="btn btn-outline-secondary btn-sm" type="button" id="clearCustomer">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </div>
+                        <div id="customerSuggestions" class="product-suggestions d-none"></div>
+                        <input type="hidden" id="selectedCustomerId">
+                        <div id="selectedCustomerInfo" class="mt-2 small text-success d-none"></div>
+                    </div>
+                }
+                else
+                {
+                    <input type="hidden" id="selectedCustomerId" value="@(invoice.CustomerId?.ToString() ?? "")">
+                }
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">تاريخ الإرجاع</label>
+                    <input type="datetime-local" id="returnDate" class="form-control form-control-sm"
+                        value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm", System.Globalization.CultureInfo.InvariantCulture)">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">سبب الإرجاع</label>
+                    <textarea id="reason" class="form-control form-control-sm" rows="2" placeholder="اذكر سبب الإرجاع..."></textarea>
+                </div>
+
+                <hr>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="fw-bold fs-5">الإجمالي</span>
+                    <input type="number" id="totalAmount" class="form-control form-control-sm text-end fw-bold"
+                        style="width:140px" min="0" step="0.001" value="0" placeholder="0.000">
+                </div>
+
+                <button type="button" id="saveReturn" class="btn btn-warning w-100 btn-lg rounded-pill" disabled>
+                    <i class="bi bi-save2 me-2"></i>حفظ المرتجع
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+let returnItems = [];
+let allProducts = [];
+fetch('/Products/GetAllJson').then(r => r.json()).then(d => { allProducts = d; }).catch(() => {});
+
+let invoiceId = @(Model.InvoiceId.HasValue ? Model.InvoiceId.Value.ToString() : "null");
+
+// Invoice search
+const invoiceNumberInput = document.getElementById('invoiceNumberInput');
+if (invoiceNumberInput) {
+    let invSearchTimeout;
+    invoiceNumberInput.addEventListener('input', () => {
+        clearTimeout(invSearchTimeout);
+        const q = invoiceNumberInput.value.trim();
+        const sugg = document.getElementById('invoiceSearchSuggestions');
+        if (!q) { sugg.classList.add('d-none'); return; }
+        invSearchTimeout = setTimeout(async () => {
+            try {
+                const res = await fetch(`/Invoices/Search?term=${encodeURIComponent(q)}`);
+                const list = await res.json();
+                if (!list.length) { sugg.classList.add('d-none'); return; }
+                sugg.innerHTML = list.map(i => `
+                    <div class="suggestion-item" data-number="${i.invoiceNumber}">
+                        <div class="fw-semibold small">${i.invoiceNumber}</div>
+                        <small class="text-muted">${i.customerName || ''}</small>
+                    </div>`).join('');
+                sugg.classList.remove('d-none');
+                sugg.querySelectorAll('.suggestion-item').forEach(el => {
+                    el.addEventListener('click', () => {
+                        invoiceNumberInput.value = el.dataset.number;
+                        sugg.classList.add('d-none');
+                        loadInvoice(el.dataset.number);
+                    });
+                });
+            } catch {}
+        }, 250);
+    });
+
+    document.getElementById('loadInvoiceBtn').addEventListener('click', () => {
+        const num = invoiceNumberInput.value.trim();
+        if (num) loadInvoice(num);
+    });
+
+    invoiceNumberInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); loadInvoice(invoiceNumberInput.value.trim()); }
+    });
+}
+
+async function loadInvoice(number) {
+    if (!number) return;
+    const info = document.getElementById('invoiceInfo');
+    const btns = document.getElementById('invoiceItemsButtons');
+    info.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>جاري البحث...';
+    info.classList.remove('d-none');
+    btns.innerHTML = '';
+    try {
+        const res = await fetch(`/Invoices/GetByNumber?number=${encodeURIComponent(number)}`);
+        if (!res.ok) { info.innerHTML = '<span class="text-danger">الفاتورة غير موجودة</span>'; return; }
+        const inv = await res.json();
+        invoiceId = inv.id;
+        info.innerHTML = `<div class="alert alert-info py-2 mb-0 small">
+            <strong>${inv.invoiceNumber}</strong>
+            ${inv.customerName ? ' — ' + inv.customerName : ''}
+            — ${inv.invoiceDate}
+            — <span class="text-warning fw-bold">${parseFloat(inv.totalAmount).toFixed(3)} ر.ع.</span>
+        </div>`;
+        btns.innerHTML = '<p class="small text-muted mb-2 w-100">اضغط على منتج لإضافته:</p>' +
+            inv.items.map(i => `
+                <button type="button" class="btn btn-outline-warning btn-sm"
+                    onclick="addItem(${i.productId}, '${i.productName.replace(/'/g,"\\'")}', ${i.unitPrice}, ${i.quantity})">
+                    <i class="bi bi-plus-circle me-1"></i>${i.productName}
+                    <span class="badge bg-warning text-dark ms-1">${i.quantity}</span>
+                </button>`).join('');
+        // set customer id in summary if available
+        const custInput = document.getElementById('selectedCustomerId');
+        if (custInput && inv.customerId) custInput.value = inv.customerId;
+    } catch { info.innerHTML = '<span class="text-danger">خطأ في الاتصال</span>'; }
+}
+
+// Product search
+const productSearch = document.getElementById('productSearch');
+const productSuggestions = document.getElementById('productSuggestions');
+let searchTimeout;
+
+productSearch.addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    const q = productSearch.value.trim().toLowerCase();
+    if (!q) { productSuggestions.classList.add('d-none'); return; }
+    searchTimeout = setTimeout(() => {
+        const filtered = allProducts.filter(p =>
+            p.name.toLowerCase().includes(q) || (p.sku && p.sku.toLowerCase().includes(q))
+        ).slice(0, 8);
+        if (!filtered.length) { productSuggestions.classList.add('d-none'); return; }
+        productSuggestions.innerHTML = filtered.map(p => `
+            <div class="suggestion-item" data-id="${p.id}" data-name="${p.name}"
+                data-price="${p.salePrice}" data-stock="${p.currentStock}" data-unit="${p.unit}">
+                <div>
+                    <div class="fw-semibold small">${p.name}</div>
+                    <small class="text-muted">${p.unit} | مخزون: ${p.currentStock}</small>
+                </div>
+                <span class="badge bg-warning-subtle text-warning">${parseFloat(p.salePrice).toFixed(3)} ر.ع.</span>
+            </div>
+        `).join('');
+        productSuggestions.classList.remove('d-none');
+        productSuggestions.querySelectorAll('.suggestion-item').forEach(el => {
+            el.addEventListener('click', () => {
+                addItem(parseInt(el.dataset.id), el.dataset.name, parseFloat(el.dataset.price), 9999);
+                productSearch.value = '';
+                productSuggestions.classList.add('d-none');
+            });
+        });
+    }, 150);
+});
+
+document.addEventListener('click', e => {
+    if (!productSearch.contains(e.target)) productSuggestions.classList.add('d-none');
+});
+
+function addItem(id, name, price, maxQty) {
+    const existing = returnItems.find(i => i.productId === id);
+    if (existing) {
+        existing.quantity = Math.min(existing.quantity + 1, maxQty);
+        existing.total = existing.quantity * existing.unitPrice;
+    } else {
+        returnItems.push({ productId: id, productName: name, quantity: 1, unitPrice: price, total: price, maxQty });
+    }
+    renderItems(); calcTotal(true);
+}
+
+function renderItems() {
+    const tbody = document.getElementById('itemsBody');
+    if (!returnItems.length) {
+        tbody.innerHTML = `<tr id="emptyRow"><td colspan="5" class="text-center text-muted py-5">
+            <i class="bi bi-inbox fs-2 d-block mb-2"></i>اضغط على المنتج أو ابحث لإضافته</td></tr>`;
+        document.getElementById('itemCount').textContent = '0 منتج';
+        document.getElementById('saveReturn').disabled = true;
+        return;
+    }
+    tbody.innerHTML = returnItems.map((item, idx) => `
+        <tr>
+            <td>
+                <div class="fw-semibold small">${item.productName}</div>
+            </td>
+            <td>
+                <div class="input-group input-group-sm">
+                    <button class="btn btn-outline-secondary" onclick="changeQty(${idx},-1)">-</button>
+                    <input type="number" class="form-control text-center" value="${item.quantity}" min="1"
+                        max="${item.maxQty}" onchange="setQty(${idx},this.value)" style="width:50px">
+                    <button class="btn btn-outline-secondary" onclick="changeQty(${idx},1)">+</button>
+                </div>
+            </td>
+            <td>
+                <input type="number" class="form-control form-control-sm text-end" value="${item.unitPrice.toFixed(3)}"
+                    min="0" step="0.001" onchange="setPrice(${idx},this.value)" style="width:100px">
+            </td>
+            <td class="fw-semibold text-warning">${item.total.toFixed(3)}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-danger" onclick="removeItem(${idx})">
+                    <i class="bi bi-trash3"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+    document.getElementById('itemCount').textContent = `${returnItems.length} منتج`;
+    document.getElementById('saveReturn').disabled = false;
+}
+
+function changeQty(idx, delta) {
+    const newQty = returnItems[idx].quantity + delta;
+    if (newQty < 1) return;
+    if (newQty > returnItems[idx].maxQty) { showToast(`الحد الأقصى ${returnItems[idx].maxQty}`, 'warning'); return; }
+    returnItems[idx].quantity = newQty;
+    returnItems[idx].total = newQty * returnItems[idx].unitPrice;
+    renderItems(); calcTotal(true);
+}
+function setQty(idx, val) {
+    const qty = Math.max(1, Math.min(parseInt(val) || 1, returnItems[idx].maxQty));
+    returnItems[idx].quantity = qty;
+    returnItems[idx].total = qty * returnItems[idx].unitPrice;
+    renderItems(); calcTotal(true);
+}
+function setPrice(idx, val) {
+    returnItems[idx].unitPrice = parseFloat(val) || 0;
+    returnItems[idx].total = returnItems[idx].quantity * returnItems[idx].unitPrice;
+    renderItems(); calcTotal(true);
+}
+function removeItem(idx) { returnItems.splice(idx, 1); renderItems(); calcTotal(); }
+
+function calcTotal(fromItems = false) {
+    if (fromItems) {
+        const computed = returnItems.reduce((s, i) => s + i.total, 0);
+        document.getElementById('totalAmount').value = computed.toFixed(3);
+    }
+    updateSaveBtn();
+}
+
+function updateSaveBtn() {
+    const hasItems = returnItems.length > 0;
+    const hasManual = (parseFloat(document.getElementById('totalAmount').value) || 0) > 0;
+    document.getElementById('saveReturn').disabled = !hasItems && !hasManual;
+}
+
+document.getElementById('totalAmount').addEventListener('input', updateSaveBtn);
+
+// Customer search
+const customerSearchEl = document.getElementById('customerSearch');
+if (customerSearchEl) {
+    const customerSuggestions = document.getElementById('customerSuggestions');
+    let customerTimeout;
+    customerSearchEl.addEventListener('input', () => {
+        clearTimeout(customerTimeout);
+        const q = customerSearchEl.value.trim();
+        if (!q) { customerSuggestions.classList.add('d-none'); return; }
+        customerTimeout = setTimeout(async () => {
+            const res = await fetch(`/Customers/Search?term=${encodeURIComponent(q)}`);
+            const customers = await res.json();
+            if (!customers.length) { customerSuggestions.classList.add('d-none'); return; }
+            customerSuggestions.innerHTML = customers.map(c => `
+                <div class="suggestion-item" data-id="${c.id}" data-name="${c.name}">
+                    <div>
+                        <div class="fw-semibold small">${c.name}</div>
+                        <small class="text-muted">${c.phone || ''} ${c.carModel ? '| ' + c.carModel : ''}</small>
+                    </div>
+                </div>
+            `).join('');
+            customerSuggestions.classList.remove('d-none');
+            customerSuggestions.querySelectorAll('.suggestion-item').forEach(el => {
+                el.addEventListener('click', () => {
+                    document.getElementById('selectedCustomerId').value = el.dataset.id;
+                    customerSearchEl.value = el.dataset.name;
+                    customerSuggestions.classList.add('d-none');
+                    document.getElementById('selectedCustomerInfo').textContent = '✓ تم اختيار العميل';
+                    document.getElementById('selectedCustomerInfo').classList.remove('d-none');
+                });
+            });
+        }, 250);
+    });
+    document.getElementById('clearCustomer')?.addEventListener('click', () => {
+        customerSearchEl.value = '';
+        document.getElementById('selectedCustomerId').value = '';
+        document.getElementById('selectedCustomerInfo').classList.add('d-none');
+        customerSuggestions.classList.add('d-none');
+    });
+    document.addEventListener('click', e => {
+        if (!customerSearchEl.closest('.mb-3').contains(e.target)) customerSuggestions.classList.add('d-none');
+    });
+}
+
+// Save
+document.getElementById('saveReturn').addEventListener('click', async () => {
+    const manualTotal = parseFloat(document.getElementById('totalAmount').value) || 0;
+    if (!returnItems.length && manualTotal <= 0) return;
+    const btn = document.getElementById('saveReturn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>جاري الحفظ...';
+
+    const payload = {
+        invoiceId,
+        customerId: document.getElementById('selectedCustomerId')?.value || null,
+        returnDate: document.getElementById('returnDate').value,
+        reason: document.getElementById('reason').value,
+        manualTotal,
+        items: returnItems.map(i => ({
+            productId: i.productId, productName: i.productName,
+            quantity: i.quantity, unitPrice: i.unitPrice, total: i.total
+        }))
+    };
+
+    try {
+        const res = await fetch('/SaleReturns/Create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+            },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (res.ok) {
+            window.location.href = `/SaleReturns/Details/${data.returnId}`;
+        } else {
+            showToast(data.message || 'حدث خطأ', 'danger');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-save2 me-2"></i>حفظ المرتجع';
+        }
+    } catch {
+        showToast('خطأ في الاتصال', 'danger');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-save2 me-2"></i>حفظ المرتجع';
+    }
+});
+
+function showToast(msg, type = 'info') {
+    const container = document.createElement('div');
+    container.className = `toast align-items-center text-bg-${type} border-0 show position-fixed`;
+    container.style.cssText = 'top:20px;left:50%;transform:translateX(-50%);z-index:9999;min-width:280px';
+    container.innerHTML = `<div class="d-flex"><div class="toast-body fw-semibold">${msg}</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>`;
+    document.body.appendChild(container);
+    setTimeout(() => container.remove(), 3500);
+}
+</script>
+<form id="antiforgery" method="post">@Html.AntiForgeryToken()</form>
+}

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Dashboard" xml:space="preserve"><value>Dashboard</value></data>
+  <data name="Products" xml:space="preserve"><value>Products</value></data>
+  <data name="Categories" xml:space="preserve"><value>Categories</value></data>
+  <data name="Stock" xml:space="preserve"><value>Stock</value></data>
+  <data name="Invoices" xml:space="preserve"><value>Invoices</value></data>
+  <data name="Customers" xml:space="preserve"><value>Customers</value></data>
+  <data name="Reports" xml:space="preserve"><value>Reports</value></data>
+  <data name="Users" xml:space="preserve"><value>Users</value></data>
+  <data name="Logout" xml:space="preserve"><value>Logout</value></data>
+  <data name="Language" xml:space="preserve"><value>Language</value></data>
+  <data name="Arabic" xml:space="preserve"><value>العربية</value></data>
+  <data name="English" xml:space="preserve"><value>English</value></data>
+  <data name="Inventory" xml:space="preserve"><value>Inventory &amp; Products</value></data>
+  <data name="Sales" xml:space="preserve"><value>Sales</value></data>
+  <data name="Administration" xml:space="preserve"><value>Administration</value></data>
+  <data name="DarkMode" xml:space="preserve"><value>Dark Mode</value></data>
+</root>

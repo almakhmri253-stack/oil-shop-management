@@ -1,0 +1,102 @@
+@model IEnumerable<OilShopManagement.Models.Invoice>
+@{
+    ViewData["Title"] = L.T("الفواتير","Invoices");
+}
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <h4 class="fw-bold mb-0"><i class="bi bi-receipt me-2 text-primary"></i>@L.T("الفواتير","Invoices")</h4>
+    <a href="/Invoices/Create" class="btn btn-primary rounded-pill px-4">
+        <i class="bi bi-plus-circle me-2"></i>@L.T("فاتورة جديدة","New Invoice")
+    </a>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold">@L.T("من تاريخ","From")</label>
+                <input type="date" name="from" class="form-control" value="@ViewBag.From">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold">@L.T("إلى تاريخ","To")</label>
+                <input type="date" name="to" class="form-control" value="@ViewBag.To">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small fw-semibold">@L.T("بحث","Search")</label>
+                <input type="text" name="search" class="form-control" placeholder="@L.T("رقم الفاتورة أو اسم العميل...","Invoice # or customer name...")" value="@ViewBag.Search">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search me-1"></i>@L.T("بحث","Search")
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <span>@L.T("النتائج","Results"): @Model.Count() @L.T("فاتورة","invoices")</span>
+        <span class="fw-bold text-primary">@L.T("الإجمالي","Total"): @Model.Where(i=>i.Status==OilShopManagement.Models.InvoiceStatus.Completed).Sum(i=>i.TotalAmount).ToString("N3") @L.T("ر.ع.","OMR")</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>@L.T("رقم الفاتورة","Invoice #")</th>
+                        <th>@L.T("العميل","Customer")</th>
+                        <th>@L.T("التاريخ","Date")</th>
+                        <th>@L.T("طريقة الدفع","Payment")</th>
+                        <th>@L.T("الإجمالي","Total")</th>
+                        <th>@L.T("الحالة","Status")</th>
+                        <th>@L.T("إجراءات","Actions")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var inv in Model)
+                    {
+                        <tr>
+                            <td><span class="badge bg-primary-subtle text-primary fw-semibold">@inv.InvoiceNumber</span></td>
+                            <td>@(inv.Customer?.Name ?? L.T("عميل عام","Walk-in"))</td>
+                            <td>@inv.InvoiceDate.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                @if (inv.PaymentMethod == OilShopManagement.Models.PaymentMethod.Cash)
+                                { <span class="badge bg-success-subtle text-success"><i class="bi bi-cash me-1"></i>@L.T("نقداً","Cash")</span> }
+                                else if (inv.PaymentMethod == OilShopManagement.Models.PaymentMethod.Card)
+                                { <span class="badge bg-info-subtle text-info"><i class="bi bi-credit-card me-1"></i>@L.T("بطاقة","Card")</span> }
+                                else
+                                { <span class="badge bg-warning-subtle text-warning"><i class="bi bi-bank me-1"></i>@L.T("تحويل","Transfer")</span> }
+                            </td>
+                            <td class="fw-semibold">@inv.TotalAmount.ToString("N3") @L.T("ر.ع.","OMR")</td>
+                            <td>
+                                @if (inv.Status == OilShopManagement.Models.InvoiceStatus.Completed)
+                                { <span class="badge bg-success">@L.T("مكتملة","Completed")</span> }
+                                else if (inv.Status == OilShopManagement.Models.InvoiceStatus.Cancelled)
+                                { <span class="badge bg-danger">@L.T("ملغاة","Cancelled")</span> }
+                                else
+                                { <span class="badge bg-secondary">@L.T("مسودة","Draft")</span> }
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="/Invoices/Details/@inv.Id" class="btn btn-outline-secondary rounded-start-pill" title="@L.T("تفاصيل","Details")">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="/Invoices/Print/@inv.Id" class="btn btn-outline-primary rounded-end-pill" target="_blank" title="@L.T("طباعة","Print")">
+                                        <i class="bi bi-printer"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr><td colspan="7" class="text-center text-muted py-5">
+                            <i class="bi bi-inbox fs-2 d-block mb-2"></i>@L.T("لا توجد فواتير في هذه الفترة","No invoices in this period")
+                        </td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

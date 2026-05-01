@@ -1,0 +1,311 @@
+@model OilShopManagement.Models.Product
+@{
+    ViewData["Title"] = L.T("منتج جديد","New Product");
+    var preGrade = Context.Request.Query["grade"].ToString();
+    var preCatId = Context.Request.Query["catId"].ToString();
+    if (!string.IsNullOrEmpty(preGrade) && Model != null && string.IsNullOrEmpty(Model.Name))
+        Model.Name = preGrade;
+}
+
+<style>
+    .img-upload-box {
+        border: 2px dashed #cbd5e1; border-radius: 14px;
+        padding: 1.5rem; text-align: center; cursor: pointer;
+        transition: .2s; background: #f8fafc; position: relative;
+    }
+    .img-upload-box:hover { border-color: #0d6efd; background: #f0f7ff; }
+    .img-upload-box.has-img { border-style: solid; border-color: #0d6efd; padding: .5rem; }
+    .img-preview { width:100%; max-height:180px; object-fit:contain; border-radius:10px; display:none; }
+    .img-placeholder { pointer-events: none; }
+</style>
+
+<div class="d-flex align-items-center gap-3 mb-4">
+    <a href="/Products" class="btn btn-outline-secondary rounded-circle"
+       style="width:38px;height:38px;padding:0;display:flex;align-items:center;justify-content:center">
+        <i class="bi bi-arrow-@(L.IsAr ? "right" : "left")"></i>
+    </a>
+    <h4 class="fw-bold mb-0"><i class="bi bi-plus-circle-fill me-2 text-primary"></i>@L.T("إضافة منتج جديد","New Product")</h4>
+</div>
+
+<div class="card border-0 shadow-sm" style="max-width:760px">
+    <div class="card-body p-4">
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <div class="row g-3">
+
+                <!-- Image upload -->
+                <div class="col-12">
+                    <label class="form-label fw-semibold small">@L.T("صورة المنتج","Product Image")</label>
+                    <div class="img-upload-box" id="uploadBox" onclick="document.getElementById('imageFile').click()">
+                        <img id="imgPreview" class="img-preview" src="#" alt="preview">
+                        <div class="img-placeholder" id="imgPlaceholder">
+                            <i class="bi bi-image fs-2 text-muted d-block mb-1"></i>
+                            <div class="small text-muted">@L.T("انقر لاختيار صورة","Click to select image")</div>
+                            <div class="text-muted" style="font-size:.72rem">JPG, PNG, WEBP</div>
+                        </div>
+                        <input type="file" name="imageFile" id="imageFile" accept=".jpg,.jpeg,.png,.webp"
+                               class="d-none" onchange="previewImg(this)">
+                    </div>
+                </div>
+
+                <div class="col-md-8">
+                    <label asp-for="Name" class="form-label fw-semibold small"></label>
+                    <input asp-for="Name" class="form-control" placeholder="@L.T("مثال: زيت موبيل 5W-30","e.g. Mobil Oil 5W-30")">
+                    <span asp-validation-for="Name" class="text-danger small"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="SKU" class="form-label fw-semibold small"></label>
+                    <input asp-for="SKU" class="form-control" placeholder="SKU-001">
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Brand" class="form-label fw-semibold small"></label>
+                    <input asp-for="Brand" class="form-control" placeholder="@L.T("مثال: موبيل، شل، كاسترول","e.g. Mobil, Shell, Castrol")">
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="CategoryId" class="form-label fw-semibold small"></label>
+                    <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-select">
+                        <option value="">@L.T("-- اختر التصنيف --","-- Select Category --")</option>
+                    </select>
+                    <span asp-validation-for="CategoryId" class="text-danger small"></span>
+                </div>
+                <!-- Unit + Liters + Min Stock -->
+                <div class="col-md-3">
+                    <label asp-for="Unit" class="form-label fw-semibold small"></label>
+                    <select asp-for="Unit" class="form-select" id="unitSelect" onchange="onUnitChange(this.value)">
+                        <option>@L.T("قطعة","Piece")</option>
+                        <option>@L.T("لتر","Liter")</option>
+                        <option>@L.T("كيلو","Kg")</option>
+                        <option>@L.T("علبة","Box")</option>
+                        <option>@L.T("جالون","Gallon")</option>
+                        <option>@L.T("كرتون","Carton")</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="LitersPerPiece" class="form-label fw-semibold small"></label>
+                    <div class="input-group">
+                        <input asp-for="LitersPerPiece" class="form-control" type="number" step="0.01" min="0"
+                               placeholder="@L.T("مثال: 4","e.g. 4")">
+                        <span class="input-group-text small">@L.T("لتر","L")</span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="MinStockLevel" class="form-label fw-semibold small"></label>
+                    <div class="input-group">
+                        <input asp-for="MinStockLevel" class="form-control" type="number" min="0">
+                        <span class="input-group-text small" id="minStockUnitLabel">@L.T("قطعة","Piece")</span>
+                    </div>
+                </div>
+                <!-- CurrentStock: shown for regular units -->
+                <div class="col-md-3" id="regularStockDiv">
+                    <label asp-for="CurrentStock" class="form-label fw-semibold small"></label>
+                    <input asp-for="CurrentStock" class="form-control" type="number" min="0" id="stockInput">
+                </div>
+
+                <!-- Regular unit prices -->
+                <div id="regularFields" class="col-12">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="PurchasePrice" class="form-label fw-semibold small"></label>
+                            <div class="input-group">
+                                <input asp-for="PurchasePrice" class="form-control" type="number" step="0.001" min="0" id="purchasePriceInput">
+                                <span class="input-group-text">@L.T("ر.ع.","OMR")</span>
+                            </div>
+                            <span asp-validation-for="PurchasePrice" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="SalePrice" class="form-label fw-semibold small"></label>
+                            <div class="input-group">
+                                <input asp-for="SalePrice" class="form-control" type="number" step="0.001" min="0" id="salePriceInput">
+                                <span class="input-group-text">@L.T("ر.ع.","OMR")</span>
+                            </div>
+                            <span asp-validation-for="SalePrice" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══ Carton fields (shown only when unit = كرتون) ═══ -->
+                <div id="cartonFields" class="col-12" style="display:none">
+                    <div class="card border-warning">
+                        <div class="card-header bg-warning bg-opacity-10 fw-semibold small py-2">
+                            <i class="bi bi-box-seam me-1"></i>@L.T("تفاصيل الكرتون","Carton Details")
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+
+                                <!-- Stock section -->
+                                <div class="col-12">
+                                    <div class="p-3 rounded-3" style="background:#fffbeb;border:1.5px solid #fde68a">
+                                        <div class="fw-semibold small mb-2 text-warning-emphasis">
+                                            <i class="bi bi-box-seam me-1"></i>@L.T("المخزون الأولي","Initial Stock")
+                                        </div>
+                                        <div class="row g-3 align-items-end">
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold small mb-1">@L.T("عدد الكراتين","Number of Cartons")</label>
+                                                <div class="input-group">
+                                                    <input type="number" class="form-control" min="0" id="cartonCountInput"
+                                                        placeholder="0" oninput="updateCartonStock()">
+                                                    <span class="input-group-text"><i class="bi bi-box-seam"></i></span>
+                                                </div>
+                                                <!-- Hidden real field -->
+                                                <input asp-for="CurrentStock" type="hidden" id="stockInput">
+                                            </div>
+                                            <div class="col-auto d-flex align-items-center pb-1">
+                                                <span class="fs-5 text-muted fw-bold">×</span>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label asp-for="PiecesPerUnit" class="form-label fw-semibold small mb-1"></label>
+                                                <div class="input-group">
+                                                    <input asp-for="PiecesPerUnit" class="form-control" type="number" min="1"
+                                                        id="piecesPerUnitInput" placeholder="@L.T("مثال: 12","e.g. 12")"
+                                                        oninput="updateCartonStock(); calcPiecePrices()">
+                                                    <span class="input-group-text" style="font-size:.75rem">@L.T("حبة","pcs")</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-auto d-flex align-items-center pb-1">
+                                                <span class="fs-5 text-muted fw-bold">=</span>
+                                            </div>
+                                            <div class="col">
+                                                <label class="form-label fw-semibold small mb-1">@L.T("إجمالي الحبات","Total Pieces")</label>
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control text-center fw-bold text-success"
+                                                        id="totalPiecesDisplay" readonly placeholder="0"
+                                                        style="background:#f0fdf4;border-color:#86efac">
+                                                    <span class="input-group-text text-success fw-semibold" style="font-size:.75rem">@L.T("حبة","pcs")</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Summary line -->
+                                        <div id="cartonStockSummary" class="mt-2 small text-muted" style="display:none">
+                                            <i class="bi bi-info-circle me-1 text-warning"></i>
+                                            <span id="cartonStockSummaryText"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Pricing section -->
+                                <div class="col-md-4">
+                                    <label asp-for="CartonPurchasePrice" class="form-label fw-semibold small"></label>
+                                    <div class="input-group">
+                                        <input asp-for="CartonPurchasePrice" class="form-control" type="number" step="0.001" min="0"
+                                            id="cartonPurchasePriceInput" oninput="calcPiecePrices()">
+                                        <span class="input-group-text">@L.T("ر.ع.","OMR")</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label asp-for="CartonSalePrice" class="form-label fw-semibold small"></label>
+                                    <div class="input-group">
+                                        <input asp-for="CartonSalePrice" class="form-control" type="number" step="0.001" min="0"
+                                            id="cartonSalePriceInput" oninput="calcPiecePrices()">
+                                        <span class="input-group-text">@L.T("ر.ع.","OMR")</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4"><!-- spacer --></div>
+
+                                <!-- Auto-calculated piece prices -->
+                                <div class="col-12">
+                                    <div class="alert alert-info py-2 small mb-0" id="cartonCalcInfo" style="display:none"></div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold small">@L.T("سعر شراء الحبة (محسوب)","Piece Cost (calc)")</label>
+                                    <div class="input-group">
+                                        <input asp-for="PurchasePrice" class="form-control" type="number" step="0.001" min="0" id="purchasePriceInput">
+                                        <span class="input-group-text">@L.T("ر.ع.","OMR")</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold small">@L.T("سعر بيع الحبة (محسوب)","Piece Price (calc)")</label>
+                                    <div class="input-group">
+                                        <input asp-for="SalePrice" class="form-control" type="number" step="0.001" min="0" id="salePriceInput">
+                                        <span class="input-group-text">@L.T("ر.ع.","OMR")</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <label asp-for="Description" class="form-label fw-semibold small"></label>
+                    <textarea asp-for="Description" class="form-control" rows="2"
+                              placeholder="@L.T("وصف اختياري للمنتج...","Optional product description...")"></textarea>
+                </div>
+                <div class="col-12 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary px-4 rounded-pill">
+                        <i class="bi bi-save2 me-2"></i>@L.T("حفظ","Save")
+                    </button>
+                    <a href="/Products" class="btn btn-outline-secondary rounded-pill">@L.T("إلغاء","Cancel")</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+    function onUnitChange(val) {
+        const isCarton = val === 'كرتون' || val === 'Carton';
+        document.getElementById('regularFields').style.display  = isCarton ? 'none' : '';
+        document.getElementById('cartonFields').style.display   = isCarton ? '' : 'none';
+        document.getElementById('regularStockDiv').style.display = isCarton ? 'none' : '';
+        // update min stock unit label
+        const unitLabel = { 'قطعة':'قطعة','لتر':'لتر','كيلو':'كيلو','علبة':'علبة','جالون':'جالون','كرتون':'كرتون',
+                            'Piece':'Piece','Liter':'Liter','Kg':'Kg','Box':'Box','Gallon':'Gallon','Carton':'Carton' };
+        document.getElementById('minStockUnitLabel').textContent = unitLabel[val] || val;
+        if (isCarton) updateCartonStock();
+    }
+    onUnitChange(document.getElementById('unitSelect').value);
+
+    function updateCartonStock() {
+        const cartons = parseInt(document.getElementById('cartonCountInput').value) || 0;
+        const pieces  = parseInt(document.getElementById('piecesPerUnitInput').value) || 0;
+        const total   = cartons * pieces;
+        document.getElementById('stockInput').value       = cartons;
+        document.getElementById('totalPiecesDisplay').value = total > 0 ? total : '';
+        const summary = document.getElementById('cartonStockSummary');
+        const summaryText = document.getElementById('cartonStockSummaryText');
+        if (cartons > 0 && pieces > 0) {
+            summary.style.display = '';
+            summaryText.textContent = `سيتم تسجيل ${cartons} كرتون في المخزون، يعادل ${total} حبة`;
+        } else {
+            summary.style.display = 'none';
+        }
+    }
+
+    function calcPiecePrices() {
+        const pieces        = parseFloat(document.getElementById('piecesPerUnitInput').value) || 0;
+        const cartonPurchase = parseFloat(document.getElementById('cartonPurchasePriceInput').value) || 0;
+        const cartonSale     = parseFloat(document.getElementById('cartonSalePriceInput').value) || 0;
+        const info = document.getElementById('cartonCalcInfo');
+        if (pieces > 0 && (cartonPurchase > 0 || cartonSale > 0)) {
+            const piecePurchase = cartonPurchase / pieces;
+            const pieceSale     = cartonSale / pieces;
+            document.getElementById('purchasePriceInput').value = piecePurchase.toFixed(3);
+            document.getElementById('salePriceInput').value     = pieceSale.toFixed(3);
+            info.style.display = '';
+            info.innerHTML = `<i class="bi bi-calculator me-1"></i>
+                @L.T("سعر الحبة","Piece price"):
+                @L.T("شراء","Cost") <strong>${piecePurchase.toFixed(3)} @L.T("ر.ع.","OMR")</strong>
+                &nbsp;|&nbsp;
+                @L.T("بيع","Sale") <strong>${pieceSale.toFixed(3)} @L.T("ر.ع.","OMR")</strong>`;
+        } else {
+            info.style.display = 'none';
+        }
+        updateCartonStock();
+    }
+
+    function previewImg(input) {
+        if (!input.files || !input.files[0]) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+            const box = document.getElementById('uploadBox');
+            const preview = document.getElementById('imgPreview');
+            const placeholder = document.getElementById('imgPlaceholder');
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+            placeholder.style.display = 'none';
+            box.classList.add('has-img');
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+    </script>
+}

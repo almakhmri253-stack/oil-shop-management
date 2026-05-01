@@ -1,0 +1,69 @@
+@model IEnumerable<OilShopManagement.Models.PurchaseReturn>
+@{
+    ViewData["Title"] = "مرتجعات الشراء";
+}
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h4 class="fw-bold mb-0"><i class="bi bi-arrow-return-right me-2 text-warning"></i>مرتجعات الشراء</h4>
+    <a href="/PurchaseReturns/Create" class="btn btn-warning rounded-pill btn-sm">
+        <i class="bi bi-plus-lg me-1"></i>مرتجع جديد
+    </a>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <form method="get" class="d-flex gap-2 flex-wrap align-items-center">
+            <input type="date" name="from" value="@ViewBag.From" class="form-control form-control-sm" style="max-width:145px">
+            <span class="text-muted small">إلى</span>
+            <input type="date" name="to" value="@ViewBag.To" class="form-control form-control-sm" style="max-width:145px">
+            <button class="btn btn-outline-warning btn-sm px-3">بحث</button>
+            <a href="/PurchaseReturns" class="btn btn-outline-secondary btn-sm">إعادة تعيين</a>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>رقم المرتجع</th>
+                        <th>فاتورة الشراء</th>
+                        <th>المورد</th>
+                        <th>التاريخ</th>
+                        <th>الإجمالي</th>
+                        <th>السبب</th>
+                        <th style="width:60px"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@r.ReturnNumber</td>
+                            <td>@(r.Purchase?.PurchaseNumber ?? "—")</td>
+                            <td>@(r.Supplier?.Name ?? "—")</td>
+                            <td>@r.ReturnDate.ToString("yyyy/MM/dd")</td>
+                            <td class="fw-semibold text-warning">@r.TotalAmount.ToString("N3") ر.ع.</td>
+                            <td class="text-muted small">@(r.Reason ?? "—")</td>
+                            <td>
+                                <a href="/PurchaseReturns/Details/@r.Id" class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-5">
+                                <i class="bi bi-inbox fs-2 d-block mb-2"></i>لا توجد مرتجعات شراء
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

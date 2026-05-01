@@ -1,0 +1,96 @@
+@model OilShopManagement.Models.Customer
+@{
+    ViewData["Title"] = "تفاصيل العميل";
+}
+
+<div class="d-flex align-items-center gap-3 mb-4">
+    <a href="/Customers" class="btn btn-outline-secondary rounded-circle" style="width:38px;height:38px;padding:0;display:flex;align-items:center;justify-content:center">
+        <i class="bi bi-arrow-right"></i>
+    </a>
+    <h4 class="fw-bold mb-0">@Model.Name</h4>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header fw-bold">بيانات العميل</div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <div class="rounded-circle bg-primary bg-opacity-10 d-inline-flex align-items-center justify-content-center" style="width:72px;height:72px">
+                        <i class="bi bi-person-fill text-primary fs-2"></i>
+                    </div>
+                    <h5 class="mt-2 mb-0 fw-bold">@Model.Name</h5>
+                </div>
+                <dl class="row small mb-0">
+                    @if (!string.IsNullOrEmpty(Model.Phone))
+                    {
+                        <dt class="col-4 text-muted">الجوال</dt>
+                        <dd class="col-8">@Model.Phone</dd>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Email))
+                    {
+                        <dt class="col-4 text-muted">البريد</dt>
+                        <dd class="col-8">@Model.Email</dd>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.CarModel))
+                    {
+                        <dt class="col-4 text-muted">السيارة</dt>
+                        <dd class="col-8">@Model.CarModel</dd>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.PlateNumber))
+                    {
+                        <dt class="col-4 text-muted">اللوحة</dt>
+                        <dd class="col-8 fw-bold">@Model.PlateNumber</dd>
+                    }
+                    <dt class="col-4 text-muted">منذ</dt>
+                    <dd class="col-8">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
+                </dl>
+                <div class="d-flex gap-2 mt-3">
+                    <a href="/Customers/Edit/@Model.Id" class="btn btn-primary btn-sm rounded-pill flex-fill">
+                        <i class="bi bi-pencil me-1"></i>تعديل
+                    </a>
+                    <a href="/Invoices/Create" class="btn btn-success btn-sm rounded-pill flex-fill">
+                        <i class="bi bi-plus me-1"></i>فاتورة
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header fw-bold">آخر الفواتير</div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>رقم الفاتورة</th>
+                            <th>التاريخ</th>
+                            <th>الإجمالي</th>
+                            <th>الحالة</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var inv in Model.Invoices)
+                        {
+                            <tr>
+                                <td><a href="/Invoices/Details/@inv.Id">@inv.InvoiceNumber</a></td>
+                                <td>@inv.InvoiceDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td class="fw-semibold">@inv.TotalAmount.ToString("N3") ر.ع.</td>
+                                <td>
+                                    @if (inv.Status == OilShopManagement.Models.InvoiceStatus.Completed)
+                                    { <span class="badge bg-success">مكتملة</span> }
+                                    else
+                                    { <span class="badge bg-danger">ملغاة</span> }
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.Invoices.Any())
+                        {
+                            <tr><td colspan="4" class="text-center text-muted py-4">لا توجد فواتير</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

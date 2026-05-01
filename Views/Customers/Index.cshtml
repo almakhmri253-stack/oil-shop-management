@@ -1,0 +1,78 @@
+@model IEnumerable<OilShopManagement.Models.Customer>
+@{
+    ViewData["Title"] = L.T("العملاء","Customers");
+}
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <h4 class="fw-bold mb-0"><i class="bi bi-people me-2 text-primary"></i>@L.T("العملاء","Customers")</h4>
+    <a href="/Customers/Create" class="btn btn-primary rounded-pill px-4">
+        <i class="bi bi-person-plus me-2"></i>@L.T("عميل جديد","New Customer")
+    </a>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2">
+            <div class="col-md-8">
+                <input type="text" name="search" class="form-control" placeholder="@L.T("البحث بالاسم أو الجوال...","Search by name or phone...")" value="@ViewBag.Search">
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search me-1"></i>@L.T("بحث","Search")</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>@L.T("الاسم","Name")</th>
+                        <th>@L.T("الجوال","Phone")</th>
+                        <th>@L.T("نوع السيارة","Car Model")</th>
+                        <th>@L.T("رقم اللوحة","Plate")</th>
+                        <th>@L.T("تاريخ التسجيل","Registered")</th>
+                        <th>@L.T("إجراءات","Actions")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var c in Model)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@c.Name</td>
+                            <td>@(c.Phone ?? "-")</td>
+                            <td>@(c.CarModel ?? "-")</td>
+                            <td>@(c.PlateNumber ?? "-")</td>
+                            <td class="small text-muted">@c.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="/Customers/Details/@c.Id" class="btn btn-outline-secondary" title="@L.T("تفاصيل","Details")">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="/Customers/Edit/@c.Id" class="btn btn-outline-primary" title="@L.T("تعديل","Edit")">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form asp-controller="Customers" asp-action="Delete" asp-route-id="@c.Id" method="post"
+                                        onsubmit="return confirm('@L.T("حذف العميل؟","Delete customer?")')">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-outline-danger" title="@L.T("حذف","Delete")">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr><td colspan="6" class="text-center text-muted py-5">
+                            <i class="bi bi-people fs-2 d-block mb-2"></i>@L.T("لا يوجد عملاء","No customers found")
+                        </td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

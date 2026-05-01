@@ -1,0 +1,397 @@
+@using Microsoft.AspNetCore.Localization
+@inject IStringLocalizer<OilShopManagement.Resources.Views.Account.LoginResources> localizer
+@model OilShopManagement.Controllers.LoginViewModel
+@{
+    ViewData["Title"] = localizer["Title"];
+    Layout = null;
+    var isAr = CultureInfo.CurrentCulture.Name.StartsWith("ar");
+    var dir = isAr ? "rtl" : "ltr";
+    var lang = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+    var bsCss = isAr
+        ? "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css"
+        : "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css";
+}
+<!DOCTYPE html>
+<html lang="@lang" dir="@dir">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@ViewData["Title"]</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="@bsCss">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        html, body { height: 100%; margin: 0; font-family: 'Cairo', sans-serif; }
+
+        .login-wrapper {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: @(isAr ? "row-reverse" : "row");
+        }
+
+        /* ── Brand Panel ── */
+        .brand-panel {
+            flex: 0 0 42%;
+            background: linear-gradient(160deg, #0a0f1e 0%, #0d2137 40%, #0a3d62 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .brand-panel::before {
+            content: '';
+            position: absolute;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%);
+            top: -100px; left: -100px;
+            border-radius: 50%;
+        }
+        .brand-panel::after {
+            content: '';
+            position: absolute;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(245,158,11,0.1) 0%, transparent 70%);
+            bottom: -80px; right: -80px;
+            border-radius: 50%;
+        }
+        .brand-logo-area {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            position: relative; z-index: 1;
+        }
+        .brand-icon {
+            width: 52px; height: 52px;
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem;
+            box-shadow: 0 8px 24px rgba(245,158,11,0.35);
+            flex-shrink: 0;
+        }
+        .brand-name { color: #fff; font-size: 1.15rem; font-weight: 700; line-height: 1.2; }
+        .brand-name span { display: block; font-size: 0.75rem; font-weight: 400; color: rgba(255,255,255,0.55); }
+
+        .brand-hero { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 2rem 0; }
+        .brand-headline {
+            font-size: clamp(1.6rem, 3vw, 2.2rem);
+            font-weight: 900;
+            color: #fff;
+            line-height: 1.3;
+            margin-bottom: 1rem;
+        }
+        .brand-headline span { color: #f59e0b; }
+        .brand-sub { color: rgba(255,255,255,0.6); font-size: 0.95rem; line-height: 1.7; margin-bottom: 2rem; }
+
+        .feature-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.75rem; }
+        .feature-list li {
+            display: flex; align-items: center; gap: 0.75rem;
+            color: rgba(255,255,255,0.8); font-size: 0.9rem;
+        }
+        .feature-list li .fi {
+            width: 32px; height: 32px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem; flex-shrink: 0;
+        }
+
+        .brand-footer { position: relative; z-index: 1; }
+        .brand-footer p { color: rgba(255,255,255,0.35); font-size: 0.78rem; margin: 0; }
+
+        /* Floating oil drops decoration */
+        .drops { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+        .drop {
+            position: absolute;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            opacity: 0.06;
+            animation: floatDrop linear infinite;
+        }
+        @@keyframes floatDrop {
+            0%   { transform: rotate(-45deg) translateY(0);   opacity: 0.06; }
+            50%  { opacity: 0.1; }
+            100% { transform: rotate(-45deg) translateY(-80px); opacity: 0; }
+        }
+
+        /* ── Form Panel ── */
+        .form-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            padding: 2.5rem 1.5rem;
+            position: relative;
+        }
+        [data-dark] .form-panel { background: #0f172a; }
+
+        .form-box {
+            width: 100%;
+            max-width: 420px;
+            background: #fff;
+            border-radius: 20px;
+            padding: 2.5rem 2.25rem;
+            box-shadow: 0 4px 40px rgba(0,0,0,0.08);
+            animation: slideUp 0.5s ease both;
+        }
+        @@keyframes slideUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-title { font-size: 1.5rem; font-weight: 800; color: #0f172a; margin-bottom: 0.25rem; }
+        .form-subtitle { color: #64748b; font-size: 0.875rem; margin-bottom: 1.75rem; }
+
+        .input-icon-wrap { position: relative; }
+        .input-icon-wrap .form-control {
+            padding-inline-start: 2.75rem;
+            height: 48px;
+            border-radius: 10px;
+            border: 1.5px solid #e2e8f0;
+            font-size: 0.9rem;
+            transition: border-color .2s, box-shadow .2s;
+            background: #f8fafc;
+        }
+        .input-icon-wrap .form-control:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+            background: #fff;
+        }
+        .input-icon-wrap .field-icon {
+            position: absolute;
+            inset-inline-start: 0.85rem;
+            top: 50%; transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 1rem;
+            pointer-events: none;
+        }
+        .input-icon-wrap .toggle-eye {
+            position: absolute;
+            inset-inline-end: 0.75rem;
+            top: 50%; transform: translateY(-50%);
+            background: none; border: none; padding: 0;
+            color: #94a3b8; cursor: pointer; font-size: 1rem;
+        }
+        .input-icon-wrap .toggle-eye:hover { color: #3b82f6; }
+
+        .form-label { font-size: 0.82rem; font-weight: 600; color: #374151; margin-bottom: 0.4rem; }
+
+        .btn-login {
+            height: 48px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1rem;
+            background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+            border: none;
+            letter-spacing: 0.02em;
+            transition: transform .15s, box-shadow .15s;
+        }
+        .btn-login:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(59,130,246,0.35);
+        }
+        .btn-login:active { transform: translateY(0); }
+
+        .divider { border: none; border-top: 1px solid #e2e8f0; margin: 1.5rem 0; }
+
+        .credentials-box {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 10px;
+            padding: 0.85rem 1rem;
+            font-size: 0.8rem;
+            color: #0369a1;
+        }
+        .credentials-box i { font-size: 1rem; }
+
+        .lang-switcher {
+            position: absolute;
+            top: 1.25rem;
+            inset-inline-end: 1.25rem;
+            display: flex; gap: 0.4rem;
+        }
+        .lang-btn {
+            padding: 0.3rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1.5px solid #e2e8f0;
+            color: #64748b;
+            background: #fff;
+            transition: all .2s;
+        }
+        .lang-btn.active, .lang-btn:hover {
+            background: #1d4ed8;
+            border-color: #1d4ed8;
+            color: #fff;
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .login-wrapper { flex-direction: column !important; }
+            .brand-panel { flex: none; min-height: 200px; padding: 1.5rem; }
+            .brand-hero { padding: 0.5rem 0; }
+            .feature-list { flex-direction: row; flex-wrap: wrap; }
+            .brand-footer { display: none; }
+            .form-panel { padding: 1.5rem 1rem; }
+            .form-box { padding: 1.75rem 1.25rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-wrapper">
+
+    <!-- ── Brand Panel ── -->
+    <div class="brand-panel">
+        <div class="drops">
+            <div class="drop" style="width:80px;height:80px;background:#3b82f6;top:15%;left:10%;animation-duration:8s;animation-delay:0s"></div>
+            <div class="drop" style="width:50px;height:50px;background:#f59e0b;top:55%;left:65%;animation-duration:11s;animation-delay:2s"></div>
+            <div class="drop" style="width:35px;height:35px;background:#3b82f6;top:75%;left:20%;animation-duration:9s;animation-delay:4s"></div>
+            <div class="drop" style="width:60px;height:60px;background:#f59e0b;top:30%;left:80%;animation-duration:13s;animation-delay:1s"></div>
+        </div>
+
+        <div class="brand-logo-area">
+            <div class="brand-icon">🛢️</div>
+            <div class="brand-name">
+                @(isAr ? "نظام زيوت السيارات" : "Auto Oil System")
+                <span>@(isAr ? "إدارة احترافية متكاملة" : "Professional Management")</span>
+            </div>
+        </div>
+
+        <div class="brand-hero">
+            <div class="brand-headline">
+                @if (isAr) {
+                    <text>إدارة محلك<br>بكفاءة <span>استثنائية</span></text>
+                } else {
+                    <text>Manage Your Shop<br>with <span>Excellence</span></text>
+                }
+            </div>
+            <p class="brand-sub">
+                @(isAr
+                    ? "منصة متكاملة لإدارة المبيعات والمخزون والفواتير وتقارير الأرباح — كل ما تحتاجه في مكان واحد."
+                    : "A complete platform for sales, inventory, invoicing and profit reports — everything you need in one place.")
+            </p>
+            <ul class="feature-list">
+                <li>
+                    <div class="fi" style="background:rgba(59,130,246,0.2);color:#60a5fa"><i class="bi bi-receipt-cutoff"></i></div>
+                    @(isAr ? "إنشاء فواتير فورية" : "Instant invoice generation")
+                </li>
+                <li>
+                    <div class="fi" style="background:rgba(245,158,11,0.2);color:#fbbf24"><i class="bi bi-boxes"></i></div>
+                    @(isAr ? "تتبع المخزون لحظياً" : "Real-time stock tracking")
+                </li>
+                <li>
+                    <div class="fi" style="background:rgba(52,211,153,0.2);color:#34d399"><i class="bi bi-bar-chart-line"></i></div>
+                    @(isAr ? "تقارير المبيعات والأرباح" : "Sales & profit reports")
+                </li>
+                <li>
+                    <div class="fi" style="background:rgba(167,139,250,0.2);color:#a78bfa"><i class="bi bi-shield-lock"></i></div>
+                    @(isAr ? "صلاحيات وأدوار متعددة" : "Role-based permissions")
+                </li>
+            </ul>
+        </div>
+
+        <div class="brand-footer">
+            <p>© @DateTime.Now.Year @(isAr ? "جميع الحقوق محفوظة" : "All rights reserved")</p>
+        </div>
+    </div>
+
+    <!-- ── Form Panel ── -->
+    <div class="form-panel">
+
+        <!-- Language Switcher -->
+        <div class="lang-switcher">
+            @if (isAr) {
+                <span class="lang-btn active">ع</span>
+                <a href="/Account/SetLanguage?culture=en-US&returnUrl=@Context.Request.Path" class="lang-btn">EN</a>
+            } else {
+                <a href="/Account/SetLanguage?culture=ar-SA&returnUrl=@Context.Request.Path" class="lang-btn">ع</a>
+                <span class="lang-btn active">EN</span>
+            }
+        </div>
+
+        <div class="form-box">
+            <div class="form-title">@(isAr ? "مرحباً بك 👋" : "Welcome back 👋")</div>
+            <p class="form-subtitle">@(isAr ? "سجّل دخولك للمتابعة" : "Sign in to your account")</p>
+
+            <form asp-action="Login" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl">
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert alert-danger py-2 small rounded-3 mb-3">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        @Html.ValidationSummary(true)
+                    </div>
+                }
+
+                <div class="mb-3">
+                    <label class="form-label">@(isAr ? "البريد الإلكتروني" : "Email address")</label>
+                    <div class="input-icon-wrap">
+                        <i class="bi bi-envelope field-icon"></i>
+                        <input asp-for="Email" class="form-control" type="email"
+                               placeholder="@(isAr ? "أدخل بريدك الإلكتروني" : "Enter your email")" autofocus>
+                    </div>
+                    <span asp-validation-for="Email" class="text-danger" style="font-size:.78rem"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">@(isAr ? "كلمة المرور" : "Password")</label>
+                    <div class="input-icon-wrap">
+                        <i class="bi bi-lock field-icon"></i>
+                        <input asp-for="Password" class="form-control" type="password"
+                               placeholder="@(isAr ? "أدخل كلمة المرور" : "Enter your password")" id="pwInput">
+                        <button type="button" class="toggle-eye" onclick="togglePwd()" tabindex="-1">
+                            <i class="bi bi-eye" id="eyeIco"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger" style="font-size:.78rem"></span>
+                </div>
+
+                <div class="mb-4 d-flex align-items-center">
+                    <div class="form-check mb-0">
+                        <input asp-for="RememberMe" class="form-check-input" type="checkbox" id="rememberMe">
+                        <label class="form-check-label small" for="rememberMe" style="color:#64748b">
+                            @(isAr ? "تذكرني" : "Remember me")
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-login w-100">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>@(isAr ? "تسجيل الدخول" : "Sign In")
+                </button>
+            </form>
+
+            <hr class="divider">
+
+            <div class="credentials-box">
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <i class="bi bi-info-circle-fill"></i>
+                    <strong>@(isAr ? "بيانات الدخول الافتراضية" : "Default credentials")</strong>
+                </div>
+                <div>📧 admin@oilshop.com</div>
+                <div>🔑 Admin@123456</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function togglePwd() {
+    const inp = document.getElementById('pwInput');
+    const ico = document.getElementById('eyeIco');
+    if (inp.type === 'password') { inp.type = 'text';     ico.className = 'bi bi-eye-slash'; }
+    else                         { inp.type = 'password'; ico.className = 'bi bi-eye'; }
+}
+</script>
+</body>
+</html>

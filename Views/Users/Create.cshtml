@@ -1,0 +1,326 @@
+@using OilShopManagement.Authorization
+@{
+    ViewData["Title"] = L.T("إضافة مستخدم جديد", "New User");
+    var permGroups  = ViewBag.PermissionGroups as IEnumerable<PermissionGroup> ?? [];
+    var empDefaults = (ViewBag.EmployeeDefaults as string[]) ?? [];
+    var roles       = ViewBag.Roles as List<string> ?? new();
+}
+
+<style>
+    .perm-card { border:1.5px solid #e2e8f0; border-radius:12px; transition:.2s; }
+    .perm-card:hover { border-color:#94a3b8; }
+    .perm-card .card-header-perm {
+        border-radius:10px 10px 0 0;
+        padding:.65rem 1rem;
+        display:flex; align-items:center; justify-content:space-between;
+    }
+    .perm-check { width:18px; height:18px; cursor:pointer; accent-color:#0d6efd; }
+    .perm-item {
+        display:flex; align-items:center; gap:.6rem;
+        padding:.45rem .5rem; border-radius:8px;
+        transition:background .15s;
+    }
+    .perm-item:hover { background:#f1f5f9; }
+    .perm-item label { cursor:pointer; font-size:.875rem; flex:1; margin:0; }
+    .role-card {
+        border:2px solid #e2e8f0; border-radius:12px; padding:1rem;
+        cursor:pointer; transition:.2s; text-align:center;
+        user-select:none;
+    }
+    .role-card:hover { border-color:#94a3b8; background:#f8fafc; }
+    .role-card.selected-admin { border-color:#dc3545; background:#fff5f5; }
+    .role-card.selected-employee { border-color:#0d6efd; background:#f0f7ff; }
+    .role-card .role-icon { font-size:2rem; margin-bottom:.4rem; }
+    .step-badge {
+        width:28px; height:28px; border-radius:50%;
+        background:#0d6efd; color:#fff;
+        display:inline-flex; align-items:center; justify-content:center;
+        font-size:.8rem; font-weight:700; flex-shrink:0;
+    }
+    .section-title { font-size:1rem; font-weight:700; display:flex; align-items:center; gap:.6rem; margin-bottom:1rem; }
+    .perms-wrapper { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1rem; }
+    #adminNote {
+        background:#fff3cd; border:1px solid #ffc107; border-radius:10px;
+        padding:.85rem 1rem; font-size:.875rem;
+    }
+    .pwd-strength { height:4px; border-radius:2px; transition:.3s; margin-top:4px; }
+</style>
+
+<!-- Header -->
+<div class="d-flex align-items-center gap-3 mb-4">
+    <a href="/Users" class="btn btn-outline-secondary rounded-circle"
+       style="width:38px;height:38px;padding:0;display:flex;align-items:center;justify-content:center">
+        <i class="bi bi-arrow-@(L.IsAr ? "right" : "left")"></i>
+    </a>
+    <div>
+        <h4 class="fw-bold mb-0"><i class="bi bi-person-plus-fill me-2 text-primary"></i>@L.T("إضافة مستخدم جديد","New User")</h4>
+        <small class="text-muted">@L.T("أنشئ حساباً جديداً وحدد صلاحياته","Create a new account and assign permissions")</small>
+    </div>
+</div>
+
+<form asp-action="Create" method="post" id="createForm">
+    @Html.AntiForgeryToken()
+
+    <div class="row g-4">
+
+        <!-- ══ Left: User Info ══ -->
+        <div class="col-lg-5">
+
+            <!-- Step 1: Basic Info -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div class="section-title">
+                        <span class="step-badge">1</span>
+                        @L.T("البيانات الأساسية","Basic Information")
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">@L.T("الاسم الكامل","Full Name") <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-person text-muted"></i></span>
+                            <input type="text" name="fullName" class="form-control" required
+                                   placeholder="@L.T("مثال: أحمد محمد","e.g. John Smith")">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">@L.T("البريد الإلكتروني","Email Address") <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-envelope text-muted"></i></span>
+                            <input type="email" name="email" class="form-control" required
+                                   placeholder="user@example.com">
+                        </div>
+                    </div>
+
+                    <div class="mb-1">
+                        <label class="form-label fw-semibold small">@L.T("كلمة المرور","Password") <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-lock text-muted"></i></span>
+                            <input type="password" name="password" id="pwdInput" class="form-control" required minlength="6"
+                                   placeholder="@L.T("6 أحرف على الأقل","At least 6 characters")"
+                                   oninput="checkPwd(this.value)">
+                            <button type="button" class="btn btn-outline-secondary" onclick="togglePwd()">
+                                <i class="bi bi-eye" id="pwdEye"></i>
+                            </button>
+                        </div>
+                        <div class="pwd-strength bg-secondary-subtle mt-1" id="pwdBar"></div>
+                        <div class="d-flex gap-1 mt-1">
+                            <small id="pwdHint" class="text-muted" style="font-size:.75rem"></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Role -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="section-title">
+                        <span class="step-badge">2</span>
+                        @L.T("الدور الوظيفي","Role")
+                    </div>
+                    <input type="hidden" name="role" id="roleInput" value="Employee">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="role-card selected-employee" id="cardEmployee" onclick="selectRole('Employee')">
+                                <div class="role-icon">👷</div>
+                                <div class="fw-bold">@L.T("موظف","Employee")</div>
+                                <small class="text-muted">@L.T("صلاحيات محددة","Limited permissions")</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="role-card" id="cardAdmin" onclick="selectRole('Admin')">
+                                <div class="role-icon">🛡️</div>
+                                <div class="fw-bold">@L.T("مدير","Admin")</div>
+                                <small class="text-muted">@L.T("كل الصلاحيات","Full access")</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ══ Right: Permissions ══ -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <div class="section-title">
+                        <span class="step-badge">3</span>
+                        @L.T("الصلاحيات","Permissions")
+                        <span class="badge bg-primary-subtle text-primary ms-auto" id="permCount">0 @L.T("صلاحية","permissions")</span>
+                    </div>
+
+                    <!-- Admin note -->
+                    <div id="adminNote" class="d-none mb-3">
+                        <i class="bi bi-shield-fill-check text-warning me-2"></i>
+                        @L.T("المدير يمتلك جميع الصلاحيات تلقائياً — لا حاجة لتحديدها يدوياً.",
+                             "Admin has all permissions automatically — no need to select them manually.")
+                    </div>
+
+                    <!-- Quick actions -->
+                    <div id="permActions" class="d-flex flex-wrap gap-2 mb-3">
+                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill" onclick="selectAll()">
+                            <i class="bi bi-check-all me-1"></i>@L.T("تحديد الكل","Select All")
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill" onclick="deselectAll()">
+                            <i class="bi bi-x-circle me-1"></i>@L.T("إلغاء الكل","Deselect All")
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-success rounded-pill" onclick="setDefaults()">
+                            <i class="bi bi-stars me-1"></i>@L.T("الافتراضية","Defaults")
+                        </button>
+                    </div>
+
+                    <!-- Permission groups grid -->
+                    <div class="perms-wrapper" id="permsGrid">
+                        @{
+                            var colorMap = new Dictionary<string,string> {
+                                {"primary","#0d6efd"},{"info","#0dcaf0"},{"success","#198754"},
+                                {"warning","#ffc107"},{"danger","#dc3545"},{"dark","#212529"}
+                            };
+                        }
+                        @foreach (var group in permGroups)
+                        {
+                            var hex = colorMap.TryGetValue(group.Color, out var c) ? c : "#0d6efd";
+                            <div class="perm-card">
+                                <div class="card-header-perm" style="background:@(hex)18;">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi @group.Icon" style="color:@hex;font-size:1rem"></i>
+                                        <span class="fw-bold small" style="color:@hex">@group.Label</span>
+                                    </div>
+                                    <input type="checkbox" class="perm-check group-check"
+                                           data-group="@group.Label"
+                                           onchange="toggleGroup('@group.Label', this.checked)"
+                                           title="@L.T("تحديد المجموعة","Select group")">
+                                </div>
+                                <div class="p-2">
+                                    @foreach (var item in group.Items)
+                                    {
+                                        <div class="perm-item">
+                                            <input type="checkbox" class="perm-check perm-cb"
+                                                   name="permissions" value="@item.Value"
+                                                   id="perm_@item.Value.Replace('.','_')"
+                                                   data-group="@group.Label"
+                                                   onchange="onPermChange('@group.Label')">
+                                            <label for="perm_@item.Value.Replace('.','_')">@item.Label</label>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Submit bar -->
+    <div class="card border-0 shadow-sm mt-4">
+        <div class="card-body p-3 d-flex align-items-center justify-content-between gap-3">
+            <div class="text-muted small">
+                <i class="bi bi-info-circle me-1"></i>
+                @L.T("الحقول المميزة بـ * مطلوبة","Fields marked with * are required")
+            </div>
+            <div class="d-flex gap-2">
+                <a href="/Users" class="btn btn-outline-secondary rounded-pill px-4">
+                    @L.T("إلغاء","Cancel")
+                </a>
+                <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold">
+                    <i class="bi bi-person-check-fill me-2"></i>@L.T("إنشاء الحساب","Create Account")
+                </button>
+            </div>
+        </div>
+    </div>
+
+</form>
+
+@section Scripts {
+<script>
+const defaults = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(empDefaults));
+
+// ── Role selection ──
+function selectRole(role) {
+    document.getElementById('roleInput').value = role;
+    document.getElementById('cardEmployee').className = 'role-card' + (role === 'Employee' ? ' selected-employee' : '');
+    document.getElementById('cardAdmin').className    = 'role-card' + (role === 'Admin'    ? ' selected-admin'    : '');
+    document.getElementById('adminNote').classList.toggle('d-none', role !== 'Admin');
+    document.getElementById('permActions').classList.toggle('d-none', role === 'Admin');
+    document.getElementById('permsGrid').style.opacity = role === 'Admin' ? '0.4' : '1';
+    document.querySelectorAll('.perm-cb').forEach(cb => cb.disabled = role === 'Admin');
+    if (role === 'Employee') setDefaults();
+}
+
+// ── Permission helpers ──
+function selectAll() {
+    document.querySelectorAll('.perm-cb:not(:disabled)').forEach(cb => cb.checked = true);
+    document.querySelectorAll('.group-check').forEach(cb => cb.checked = true);
+    updateCount();
+}
+function deselectAll() {
+    document.querySelectorAll('.perm-cb:not(:disabled)').forEach(cb => cb.checked = false);
+    document.querySelectorAll('.group-check').forEach(cb => { cb.checked = false; cb.indeterminate = false; });
+    updateCount();
+}
+function setDefaults() {
+    deselectAll();
+    document.querySelectorAll('.perm-cb:not(:disabled)').forEach(cb => {
+        cb.checked = defaults.includes(cb.value);
+    });
+    document.querySelectorAll('.group-check').forEach(gc => {
+        const group = gc.dataset.group;
+        const cbs = [...document.querySelectorAll(`.perm-cb[data-group="${group}"]`)];
+        const checked = cbs.filter(c => c.checked).length;
+        gc.checked = checked === cbs.length;
+        gc.indeterminate = checked > 0 && checked < cbs.length;
+    });
+    updateCount();
+}
+function toggleGroup(group, checked) {
+    document.querySelectorAll(`.perm-cb[data-group="${group}"]:not(:disabled)`).forEach(cb => cb.checked = checked);
+    updateCount();
+}
+function onPermChange(group) {
+    const cbs = [...document.querySelectorAll(`.perm-cb[data-group="${group}"]`)];
+    const checked = cbs.filter(c => c.checked).length;
+    const gc = document.querySelector(`.group-check[data-group="${group}"]`);
+    if (gc) {
+        gc.checked = checked === cbs.length;
+        gc.indeterminate = checked > 0 && checked < cbs.length;
+    }
+    updateCount();
+}
+function updateCount() {
+    const n = document.querySelectorAll('.perm-cb:checked').length;
+    document.getElementById('permCount').textContent = n + ' @L.T("صلاحية","permissions")';
+}
+
+// ── Password strength ──
+function checkPwd(v) {
+    const bar = document.getElementById('pwdBar');
+    const hint = document.getElementById('pwdHint');
+    let score = 0;
+    if (v.length >= 6) score++;
+    if (v.length >= 10) score++;
+    if (/[A-Z]/.test(v)) score++;
+    if (/[0-9]/.test(v)) score++;
+    if (/[^A-Za-z0-9]/.test(v)) score++;
+    const colors = ['#ef4444','#f97316','#eab308','#22c55e','#16a34a'];
+    const labels = @Html.Raw(L.IsAr
+        ? "['ضعيفة جداً','ضعيفة','متوسطة','قوية','قوية جداً']"
+        : "['Very weak','Weak','Fair','Strong','Very strong']");
+    bar.style.background = score > 0 ? colors[score-1] : '#e2e8f0';
+    bar.style.width = (score * 20) + '%';
+    hint.textContent = score > 0 ? labels[score-1] : '';
+    hint.style.color = score > 0 ? colors[score-1] : '';
+}
+function togglePwd() {
+    const inp = document.getElementById('pwdInput');
+    const ico = document.getElementById('pwdEye');
+    if (inp.type === 'password') { inp.type = 'text'; ico.className = 'bi bi-eye-slash'; }
+    else { inp.type = 'password'; ico.className = 'bi bi-eye'; }
+}
+
+// Init: set employee defaults on load
+setDefaults();
+</script>
+}

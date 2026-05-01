@@ -1,0 +1,85 @@
+@model OilShopManagement.Models.SaleReturn
+@{
+    ViewData["Title"] = "تفاصيل مرتجع المبيعات";
+}
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <h4 class="fw-bold mb-0">مرتجع: <span class="text-warning">@Model.ReturnNumber</span></h4>
+    <div class="d-flex gap-2">
+        <a href="/SaleReturns" class="btn btn-outline-secondary rounded-pill btn-sm">
+            <i class="bi bi-arrow-right me-1"></i>العودة
+        </a>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header fw-bold">المنتجات المرتجعة</div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>المنتج</th>
+                            <th class="text-center">الكمية</th>
+                            <th class="text-end">سعر الوحدة</th>
+                            <th class="text-end">الإجمالي</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@item.ProductName</td>
+                                <td class="text-center">@item.Quantity</td>
+                                <td class="text-end">@item.UnitPrice.ToString("N3")</td>
+                                <td class="text-end fw-semibold">@item.Total.ToString("N3")</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot class="table-light">
+                        <tr class="table-warning">
+                            <td colspan="3" class="text-end fw-bold">الإجمالي</td>
+                            <td class="text-end fw-bold fs-5">@Model.TotalAmount.ToString("N3") ر.ع.</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-header fw-bold">معلومات المرتجع</div>
+            <div class="card-body">
+                <dl class="row mb-0 small">
+                    <dt class="col-5 text-muted">التاريخ</dt>
+                    <dd class="col-7">@Model.ReturnDate.ToString("dd/MM/yyyy HH:mm")</dd>
+                    <dt class="col-5 text-muted">فاتورة البيع</dt>
+                    <dd class="col-7">
+                        @if (Model.Invoice != null)
+                        { <a href="/Invoices/Details/@Model.Invoice.Id">@Model.Invoice.InvoiceNumber</a> }
+                        else { <span class="text-muted">—</span> }
+                    </dd>
+                    @if (!string.IsNullOrEmpty(Model.Reason))
+                    {
+                        <dt class="col-5 text-muted">السبب</dt>
+                        <dd class="col-7">@Model.Reason</dd>
+                    }
+                </dl>
+            </div>
+        </div>
+        @if (Model.Customer != null)
+        {
+            <div class="card">
+                <div class="card-header fw-bold">بيانات العميل</div>
+                <div class="card-body small">
+                    <div class="fw-semibold">@Model.Customer.Name</div>
+                    @if (!string.IsNullOrEmpty(Model.Customer.Phone))
+                    { <div class="text-muted"><i class="bi bi-phone me-1"></i>@Model.Customer.Phone</div> }
+                    @if (!string.IsNullOrEmpty(Model.Customer.CarModel))
+                    { <div class="text-muted"><i class="bi bi-car-front me-1"></i>@Model.Customer.CarModel</div> }
+                </div>
+            </div>
+        }
+    </div>
+</div>

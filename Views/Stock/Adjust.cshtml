@@ -1,0 +1,75 @@
+@model OilShopManagement.ViewModels.StockAdjustViewModel
+@{
+    ViewData["Title"] = "تعديل المخزون";
+}
+
+<div class="d-flex align-items-center gap-3 mb-4">
+    <a href="/Stock" class="btn btn-outline-secondary rounded-circle" style="width:38px;height:38px;padding:0;display:flex;align-items:center;justify-content:center">
+        <i class="bi bi-arrow-right"></i>
+    </a>
+    <h4 class="fw-bold mb-0">تعديل المخزون</h4>
+</div>
+
+<div class="card" style="max-width:600px">
+    <div class="card-body">
+        <form asp-action="Adjust" method="post">
+            @Html.AntiForgeryToken()
+            <div class="mb-3">
+                <label asp-for="ProductId" class="form-label fw-semibold">المنتج</label>
+                <select asp-for="ProductId" asp-items="Model.Products" class="form-select" id="productSelect">
+                    <option value="">-- اختر المنتج --</option>
+                </select>
+                <span asp-validation-for="ProductId" class="text-danger small"></span>
+                <div id="currentStockInfo" class="mt-2 small text-muted d-none">
+                    الكمية الحالية: <strong id="currentStockVal"></strong>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Type" class="form-label fw-semibold">نوع الحركة</label>
+                <select asp-for="Type" class="form-select">
+                    <option value="0">شراء (إضافة للمخزون)</option>
+                    <option value="2">تسوية يدوية</option>
+                    <option value="3">مرتجع</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Quantity" class="form-label fw-semibold">الكمية</label>
+                <input asp-for="Quantity" class="form-control" type="number" min="1">
+                <span asp-validation-for="Quantity" class="text-danger small"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="UnitPrice" class="form-label fw-semibold">سعر الشراء (اختياري)</label>
+                <div class="input-group">
+                    <input asp-for="UnitPrice" class="form-control" type="number" step="0.01" min="0">
+                    <span class="input-group-text">ر.ع.</span>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label asp-for="Notes" class="form-label fw-semibold">ملاحظات</label>
+                <textarea asp-for="Notes" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary px-4 rounded-pill">
+                    <i class="bi bi-save2 me-2"></i>تأكيد التعديل
+                </button>
+                <a href="/Stock" class="btn btn-outline-secondary rounded-pill">إلغاء</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+document.getElementById('productSelect').addEventListener('change', async function() {
+    const id = this.value;
+    if (!id) { document.getElementById('currentStockInfo').classList.add('d-none'); return; }
+    const res = await fetch(`/Products/GetProductJson?id=${id}`);
+    if (res.ok) {
+        const p = await res.json();
+        document.getElementById('currentStockVal').textContent = `${p.currentStock} ${p.unit}`;
+        document.getElementById('currentStockInfo').classList.remove('d-none');
+    }
+});
+</script>
+@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160" fill="none">
+  <!-- Cap -->
+  <rect x="46" y="4" width="28" height="16" rx="5" fill="#1e293b"/>
+  <!-- Neck -->
+  <rect x="50" y="18" width="20" height="14" rx="3" fill="#f97316"/>
+  <!-- Handle -->
+  <path d="M90 44 Q112 44 112 68 Q112 92 90 92" stroke="#ea580c" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <!-- Body -->
+  <rect x="22" y="30" width="70" height="114" rx="14" fill="#f97316"/>
+  <!-- Label -->
+  <rect x="28" y="50" width="58" height="78" rx="9" fill="white" opacity="0.95"/>
+  <!-- Brand stripe -->
+  <rect x="28" y="50" width="58" height="18" rx="9" fill="#1e293b"/>
+  <rect x="28" y="60" width="58" height="8" fill="#1e293b"/>
+  <text x="57" y="63" text-anchor="middle" font-size="8.5" fill="white" font-weight="bold" font-family="Arial">MOTOR OIL</text>
+  <!-- Oil drop -->
+  <path d="M57 80 Q47 96 47 106 Q47 122 57 122 Q67 122 67 106 Q67 96 57 80Z" fill="#f97316"/>
+  <!-- Shine on drop -->
+  <ellipse cx="52" cy="98" rx="3" ry="5" fill="white" opacity="0.4"/>
+</svg>

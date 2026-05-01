@@ -1,0 +1,74 @@
+@model IEnumerable<OilShopManagement.Models.StockTransaction>
+@{
+    ViewData["Title"] = L.T("حركة المخزون","Stock Movement");
+}
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <h4 class="fw-bold mb-0"><i class="bi bi-arrow-left-right me-2 text-primary"></i>@L.T("حركة المخزون","Stock Movement")</h4>
+    @if (User.IsInRole("Admin"))
+    {
+        <a href="/Stock/Adjust" class="btn btn-primary rounded-pill px-4">
+            <i class="bi bi-plus-minus me-2"></i>@L.T("تعديل المخزون","Adjust Stock")
+        </a>
+    }
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>@L.T("المنتج","Product")</th>
+                        <th>@L.T("نوع الحركة","Type")</th>
+                        <th class="text-center">@L.T("الكمية","Qty")</th>
+                        <th class="text-center">@L.T("قبل","Before")</th>
+                        <th class="text-center">@L.T("بعد","After")</th>
+                        <th>@L.T("سعر الوحدة","Unit Price")</th>
+                        <th>@L.T("ملاحظات","Notes")</th>
+                        <th>@L.T("التاريخ","Date")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var t in Model)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@t.Product?.Name</td>
+                            <td>
+                                @switch (t.Type)
+                                {
+                                    case OilShopManagement.Models.TransactionType.Purchase:
+                                        <span class="badge bg-success"><i class="bi bi-arrow-down-circle me-1"></i>@L.T("شراء","Purchase")</span>
+                                        break;
+                                    case OilShopManagement.Models.TransactionType.Sale:
+                                        <span class="badge bg-primary"><i class="bi bi-arrow-up-circle me-1"></i>@L.T("بيع","Sale")</span>
+                                        break;
+                                    case OilShopManagement.Models.TransactionType.Return:
+                                        <span class="badge bg-warning text-dark"><i class="bi bi-arrow-counterclockwise me-1"></i>@L.T("مرتجع","Return")</span>
+                                        break;
+                                    default:
+                                        <span class="badge bg-secondary"><i class="bi bi-sliders me-1"></i>@L.T("تسوية","Adjustment")</span>
+                                        break;
+                                }
+                            </td>
+                            <td class="text-center fw-bold @(t.Type == OilShopManagement.Models.TransactionType.Sale ? "text-danger" : "text-success")">
+                                @(t.Type == OilShopManagement.Models.TransactionType.Sale ? "-" : "+")@t.Quantity
+                            </td>
+                            <td class="text-center">@t.QuantityBefore</td>
+                            <td class="text-center fw-semibold">@t.QuantityAfter</td>
+                            <td>@(t.UnitPrice > 0 ? t.UnitPrice.ToString("N3") + " " + L.T("ر.ع.","OMR") : "-")</td>
+                            <td class="text-muted small">@(t.Notes ?? "-")</td>
+                            <td class="small">@t.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr><td colspan="8" class="text-center text-muted py-5">
+                            <i class="bi bi-inbox fs-2 d-block mb-2"></i>@L.T("لا توجد حركات مخزون","No stock transactions")
+                        </td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

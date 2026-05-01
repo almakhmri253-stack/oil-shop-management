@@ -1,0 +1,440 @@
+@model OilShopManagement.ViewModels.PurchaseCreateViewModel
+@{
+    ViewData["Title"] = "فاتورة شراء جديدة";
+}
+
+<style>
+    .prod-card {
+        cursor: pointer; border: 2px solid #e2e8f0; border-radius: 10px;
+        padding: .6rem .75rem; transition: .15s; background: #fff; position: relative;
+    }
+    .prod-card:hover { border-color: #198754; background: #f0fdf4; }
+    .prod-card.in-cart { border-color: #198754; background: #d1fae5; }
+    .prod-card .prod-name { font-size: .82rem; font-weight: 600; line-height: 1.2;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .prod-card .prod-brand { font-size: .68rem; color: #64748b; }
+    .prod-card .prod-footer { display: flex; justify-content: space-between; align-items: center; margin-top: .3rem; }
+    .prod-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: .5rem; }
+</style>
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h4 class="fw-bold mb-0"><i class="bi bi-cart-plus me-2 text-success"></i>فاتورة شراء جديدة</h4>
+    <a href="/Purchases" class="btn btn-outline-secondary rounded-pill btn-sm">
+        <i class="bi bi-arrow-right me-1"></i>فواتير الشراء
+    </a>
+</div>
+
+<div class="invoice-builder">
+    <!-- Left: Products + Items -->
+    <div>
+        <!-- Products Browser -->
+        <div class="card mb-3">
+            <div class="card-header d-flex align-items-center justify-content-between py-2">
+                <span><i class="bi bi-grid me-2 text-success"></i>اختر المنتجات</span>
+                <div class="d-flex align-items-center gap-2">
+                    <input type="text" id="prodFilter" class="form-control form-control-sm"
+                        style="width:160px" placeholder="فلتر..." oninput="filterProducts(this.value)">
+                    <span class="badge bg-secondary rounded-pill" id="prodCount">...</span>
+                </div>
+            </div>
+            <div class="card-body p-2">
+                <div class="prod-grid" id="prodGrid" style="max-height:280px; overflow-y:auto"></div>
+            </div>
+        </div>
+
+        <!-- Selected Items Table -->
+        <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <span><i class="bi bi-list-check me-2"></i>المنتجات المختارة</span>
+                <span class="badge bg-success rounded-pill" id="itemCount">0 منتج</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0" id="itemsTable">
+                        <thead>
+                            <tr>
+                                <th>المنتج</th>
+                                <th style="width:110px">المخزون</th>
+                                <th style="width:140px">الكمية (حبة)</th>
+                                <th style="width:150px">سعر الحبة</th>
+                                <th style="width:120px">الإجمالي</th>
+                                <th style="width:40px"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsBody">
+                            <tr id="emptyRow">
+                                <td colspan="6" class="text-center text-muted py-4">
+                                    <i class="bi bi-hand-index-thumb fs-2 d-block mb-1"></i>
+                                    اضغط على منتج من الأعلى لإضافته
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right: Summary -->
+    <div>
+        <div class="invoice-summary card">
+            <div class="card-header fw-bold">
+                <i class="bi bi-receipt me-2 text-success"></i>ملخص فاتورة الشراء
+            </div>
+            <div class="card-body">
+                <!-- Supplier -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">المورد (اختياري)</label>
+                    <div class="input-group">
+                        <input type="text" id="supplierSearch" class="form-control form-control-sm" placeholder="ابحث عن المورد...">
+                        <button class="btn btn-outline-secondary btn-sm" type="button" id="clearSupplier">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                    <div id="supplierSuggestions" class="product-suggestions d-none"></div>
+                    <input type="hidden" id="selectedSupplierId">
+                    <div id="selectedSupplierInfo" class="mt-2 small text-success d-none"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">تاريخ الشراء</label>
+                    <input type="datetime-local" id="purchaseDate" class="form-control form-control-sm"
+                        value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm", System.Globalization.CultureInfo.InvariantCulture)">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">طريقة الدفع</label>
+                    <select id="paymentMethod" class="form-select form-select-sm">
+                        <option value="0">نقداً</option>
+                        <option value="1">بطاقة</option>
+                        <option value="2">تحويل</option>
+                    </select>
+                </div>
+
+                <hr>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted">الإجمالي قبل الضريبة</span>
+                    <input type="number" id="subTotal" class="form-control form-control-sm text-end fw-semibold"
+                        style="width:120px" min="0" step="0.001" value="0" placeholder="0.000">
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted">الضريبة
+                        <input type="number" id="taxRate" value="0" min="0" max="100"
+                            class="form-control form-control-sm d-inline-block ms-1" style="width:55px">%
+                    </span>
+                    <span id="taxAmount" class="fw-semibold">0.000</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted">خصم (ر.ع.)</span>
+                    <input type="number" id="discount" value="0" min="0"
+                        class="form-control form-control-sm text-end" style="width:100px">
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="fw-bold fs-5">الإجمالي النهائي</span>
+                    <span id="totalAmount" class="fw-bold fs-5 text-success">0.000 ر.ع.</span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">ملاحظات</label>
+                    <textarea id="notes" class="form-control form-control-sm" rows="2" placeholder="ملاحظات..."></textarea>
+                </div>
+
+                <button type="button" id="savePurchase" class="btn btn-success w-100 btn-lg rounded-pill" disabled>
+                    <i class="bi bi-save2 me-2"></i>حفظ فاتورة الشراء
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+let purchaseItems = [];
+let allProducts = [];
+let filteredProducts = [];
+
+fetch('/Products/GetAllJson').then(r => r.json()).then(d => {
+    allProducts = d;
+    filteredProducts = d;
+    renderProdGrid(d);
+}).catch(() => {});
+
+/* ── Product Grid ── */
+function renderProdGrid(products) {
+    document.getElementById('prodCount').textContent = products.length + ' منتج';
+    const grid = document.getElementById('prodGrid');
+    if (!products.length) {
+        grid.innerHTML = '<div class="text-muted small p-2">لا توجد منتجات</div>';
+        return;
+    }
+    grid.innerHTML = products.map((p, idx) => {
+        const inCart = purchaseItems.some(i => i.productId === p.id);
+        const isCarton = (p.unit === 'كرتون' || p.unit === 'Carton') && p.piecesPerUnit > 0;
+        const stockLabel = isCarton
+            ? `${p.currentStock} كرتون (${p.currentStock * p.piecesPerUnit} حبة)`
+            : `${p.currentStock} ${p.unit}`;
+        const stockClass = p.currentStock <= 0 ? 'bg-danger' : (p.currentStock <= p.minStockLevel ? 'bg-warning text-dark' : 'bg-secondary');
+        return `<div class="prod-card ${inCart ? 'in-cart' : ''}" onclick="toggleProduct(${idx})" title="${p.name}">
+            <div class="prod-name">${p.name}${p.litersPerPiece > 0 ? ` <span style="font-size:.62rem;background:#e0f2fe;color:#0369a1;padding:.05rem .3rem;border-radius:20px;font-weight:700">${p.litersPerPiece % 1 === 0 ? parseInt(p.litersPerPiece) : p.litersPerPiece}L</span>` : ''}</div>
+            ${p.brand ? `<div class="prod-brand">${p.brand}</div>` : ''}
+            <div class="prod-footer">
+                <span class="badge ${stockClass} rounded-pill" style="font-size:.65rem">${stockLabel}</span>
+                ${inCart ? '<i class="bi bi-check-circle-fill text-success" style="font-size:.85rem"></i>' : ''}
+            </div>
+            <div class="text-success fw-semibold mt-1" style="font-size:.75rem">${parseFloat(p.purchasePrice).toFixed(3)} ر.ع.</div>
+        </div>`;
+    }).join('');
+}
+
+function filterProducts(q) {
+    filteredProducts = q
+        ? allProducts.filter(p => p.name.toLowerCase().includes(q.toLowerCase()) || (p.brand && p.brand.toLowerCase().includes(q.toLowerCase())))
+        : allProducts;
+    renderProdGrid(filteredProducts);
+}
+
+function toggleProduct(idx) {
+    const p = filteredProducts[idx];
+    if (!p) return;
+    const existing = purchaseItems.find(i => i.productId === p.id);
+    if (existing) {
+        // Already in cart — scroll to its row and focus qty
+        const row = document.querySelector(`tr[data-pid="${p.id}"]`);
+        if (row) { row.scrollIntoView({ behavior: 'smooth', block: 'center' }); row.classList.add('table-success'); setTimeout(() => row.classList.remove('table-success'), 1200); }
+    } else {
+        const isCarton = (p.unit === 'كرتون' || p.unit === 'Carton') && p.piecesPerUnit > 0;
+        const initQty  = isCarton ? (p.piecesPerUnit || 1) : 1; // default = 1 carton worth of pieces
+        const piecePrice = p.purchasePrice || 0;
+        purchaseItems.push({
+            productId: p.id,
+            productName: p.name,
+            quantity: initQty,
+            unitPrice: piecePrice,
+            total: piecePrice * initQty,
+            unit: p.unit,
+            currentStock: p.currentStock,
+            isCarton,
+            piecesPerUnit: p.piecesPerUnit || 0
+        });
+        renderItems();
+        calcTotals(true);
+        // Scroll to items table
+        document.getElementById('itemsTable').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    renderProdGrid(filteredProducts);
+}
+
+/* ── Items Table ── */
+function renderItems() {
+    const tbody = document.getElementById('itemsBody');
+    if (!purchaseItems.length) {
+        tbody.innerHTML = `<tr id="emptyRow"><td colspan="6" class="text-center text-muted py-4">
+            <i class="bi bi-hand-index-thumb fs-2 d-block mb-1"></i>اضغط على منتج من الأعلى لإضافته</td></tr>`;
+        document.getElementById('itemCount').textContent = '0 منتج';
+        document.getElementById('savePurchase').disabled = true;
+        return;
+    }
+    tbody.innerHTML = purchaseItems.map((item, idx) => {
+        const ppu = item.piecesPerUnit || 0;
+        // Stock display
+        const stockPieces  = item.isCarton ? item.currentStock * ppu : item.currentStock;
+        const stockLabel   = item.isCarton ? `${stockPieces} حبة` : `${item.currentStock} ${item.unit}`;
+        // After purchase
+        const addedCartons = item.isCarton ? Math.ceil(item.quantity / ppu) : item.quantity;
+        const afterCartons = item.currentStock + addedCartons;
+        const afterPieces  = item.isCarton ? afterCartons * ppu : afterCartons;
+        const afterLabel   = item.isCarton ? `${afterPieces} حبة (${afterCartons} كرتون)` : `${afterCartons} ${item.unit}`;
+        // Carton equivalence note
+        const cartonNote   = item.isCarton ? `<div style="font-size:.65rem;color:#0891b2">${Math.ceil(item.quantity/ppu)} كرتون</div>` : '';
+
+        return `<tr data-pid="${item.productId}">
+            <td>
+                <div class="fw-semibold small">${item.productName}</div>
+                <small class="text-muted">${item.isCarton ? `كرتون · ${ppu} حبة/كرتون` : item.unit}</small>
+            </td>
+            <td class="text-center small">
+                <div class="text-muted">${stockLabel}</div>
+                <div class="text-success fw-semibold" style="font-size:.68rem">← ${afterLabel}</div>
+            </td>
+            <td>
+                <div class="input-group input-group-sm">
+                    <button class="btn btn-outline-secondary" onclick="changeQty(${idx},-1)">-</button>
+                    <input type="number" class="form-control text-center" value="${item.quantity}" min="1"
+                        onchange="setQty(${idx},this.value)" style="width:54px">
+                    <button class="btn btn-outline-secondary" onclick="changeQty(${idx},1)">+</button>
+                </div>
+                ${item.isCarton ? `<div class="text-center mt-1" style="font-size:.65rem;color:#64748b">حبة ${cartonNote}</div>` : ''}
+            </td>
+            <td>
+                <div class="input-group input-group-sm">
+                    <input type="number" class="form-control text-end" value="${item.unitPrice.toFixed(3)}"
+                        min="0" step="0.001" onchange="setPrice(${idx},this.value)" style="width:90px">
+                    <span class="input-group-text" style="font-size:.65rem">${item.isCarton ? 'ر.ع./حبة' : 'ر.ع.'}</span>
+                </div>
+            </td>
+            <td class="fw-semibold text-success">
+                ${item.total.toFixed(3)}
+                ${item.isCarton ? `<div style="font-size:.65rem;color:#64748b">${item.quantity} حبة</div>` : ''}
+            </td>
+            <td>
+                <button class="btn btn-sm btn-outline-danger" onclick="removeItem(${idx})">
+                    <i class="bi bi-trash3"></i>
+                </button>
+            </td>
+        </tr>`;
+    }).join('');
+    document.getElementById('itemCount').textContent = `${purchaseItems.length} منتج`;
+    document.getElementById('savePurchase').disabled = false;
+}
+
+function changeQty(idx, delta) {
+    const newQty = purchaseItems[idx].quantity + delta;
+    if (newQty < 1) return;
+    purchaseItems[idx].quantity = newQty;
+    purchaseItems[idx].total = newQty * purchaseItems[idx].unitPrice;
+    renderItems(); calcTotals(true);
+}
+function setQty(idx, val) {
+    const qty = Math.max(1, parseInt(val) || 1);
+    purchaseItems[idx].quantity = qty;
+    purchaseItems[idx].total = qty * purchaseItems[idx].unitPrice;
+    renderItems(); calcTotals(true);
+}
+function setPrice(idx, val) {
+    purchaseItems[idx].unitPrice = parseFloat(val) || 0;
+    purchaseItems[idx].total = purchaseItems[idx].quantity * purchaseItems[idx].unitPrice;
+    renderItems(); calcTotals(true);
+}
+function removeItem(idx) {
+    purchaseItems.splice(idx, 1);
+    renderItems(); calcTotals(true);
+    renderProdGrid(filteredProducts);
+}
+
+/* ── Totals ── */
+function calcTotals(fromItems = false) {
+    if (fromItems) {
+        const computed = purchaseItems.reduce((s, i) => s + i.total, 0);
+        document.getElementById('subTotal').value = computed.toFixed(3);
+    }
+    const subTotal = parseFloat(document.getElementById('subTotal').value) || 0;
+    const taxRate  = parseFloat(document.getElementById('taxRate').value)  || 0;
+    const discount = parseFloat(document.getElementById('discount').value) || 0;
+    const taxAmount = subTotal * (taxRate / 100);
+    const total = subTotal + taxAmount - discount;
+    document.getElementById('taxAmount').textContent  = taxAmount.toFixed(3) + ' ر.ع.';
+    document.getElementById('totalAmount').textContent = total.toFixed(3) + ' ر.ع.';
+}
+
+document.getElementById('subTotal').addEventListener('input', () => { calcTotals(false); updateSaveBtn(); });
+document.getElementById('taxRate').addEventListener('input',  () => calcTotals(false));
+document.getElementById('discount').addEventListener('input', () => calcTotals(false));
+
+function updateSaveBtn() {
+    const hasItems  = purchaseItems.length > 0;
+    const hasManual = (parseFloat(document.getElementById('subTotal').value) || 0) > 0;
+    document.getElementById('savePurchase').disabled = !hasItems && !hasManual;
+}
+
+/* ── Supplier Search ── */
+const supplierSearch = document.getElementById('supplierSearch');
+const supplierSuggestions = document.getElementById('supplierSuggestions');
+let supplierTimeout;
+supplierSearch.addEventListener('input', () => {
+    clearTimeout(supplierTimeout);
+    const q = supplierSearch.value.trim();
+    if (!q) { supplierSuggestions.classList.add('d-none'); return; }
+    supplierTimeout = setTimeout(async () => {
+        const res = await fetch(`/Suppliers/Search?term=${encodeURIComponent(q)}`);
+        const suppliers = await res.json();
+        if (!suppliers.length) { supplierSuggestions.classList.add('d-none'); return; }
+        supplierSuggestions.innerHTML = suppliers.map(s => `
+            <div class="suggestion-item" data-id="${s.id}" data-name="${s.name}">
+                <div class="fw-semibold small">${s.name}</div>
+                <small class="text-muted">${s.phone || ''} ${s.contactPerson ? '| ' + s.contactPerson : ''}</small>
+            </div>
+        `).join('');
+        supplierSuggestions.classList.remove('d-none');
+        supplierSuggestions.querySelectorAll('.suggestion-item').forEach(el => {
+            el.addEventListener('click', () => {
+                document.getElementById('selectedSupplierId').value = el.dataset.id;
+                supplierSearch.value = el.dataset.name;
+                supplierSuggestions.classList.add('d-none');
+                document.getElementById('selectedSupplierInfo').textContent = '✓ تم اختيار المورد';
+                document.getElementById('selectedSupplierInfo').classList.remove('d-none');
+            });
+        });
+    }, 250);
+});
+document.getElementById('clearSupplier').addEventListener('click', () => {
+    supplierSearch.value = '';
+    document.getElementById('selectedSupplierId').value = '';
+    document.getElementById('selectedSupplierInfo').classList.add('d-none');
+    supplierSuggestions.classList.add('d-none');
+});
+document.addEventListener('click', e => {
+    if (!supplierSearch.closest('.mb-3').contains(e.target)) supplierSuggestions.classList.add('d-none');
+});
+
+/* ── Save ── */
+document.getElementById('savePurchase').addEventListener('click', async () => {
+    const manualSubTotal = parseFloat(document.getElementById('subTotal').value) || 0;
+    if (!purchaseItems.length && manualSubTotal <= 0) return;
+    const btn = document.getElementById('savePurchase');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>جاري الحفظ...';
+    const taxRate  = parseFloat(document.getElementById('taxRate').value)  || 0;
+    const discount = parseFloat(document.getElementById('discount').value) || 0;
+
+    const payload = {
+        supplierId: document.getElementById('selectedSupplierId').value || null,
+        purchaseDate: document.getElementById('purchaseDate').value,
+        paymentMethod: parseInt(document.getElementById('paymentMethod').value),
+        taxRate, discount, manualSubTotal,
+        notes: document.getElementById('notes').value,
+        items: purchaseItems.map(i => ({
+            productId: i.productId,
+            productName: i.productName,
+            quantity: i.quantity,
+            unitPrice: i.unitPrice,
+            total: i.total,
+            piecesPerUnit: i.piecesPerUnit || 0
+        }))
+    };
+
+    try {
+        const res = await fetch('/Purchases/Create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+            },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (res.ok) {
+            window.location.href = `/Purchases/Print/${data.purchaseId}`;
+        } else {
+            showToast(data.message || 'حدث خطأ', 'danger');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-save2 me-2"></i>حفظ فاتورة الشراء';
+        }
+    } catch {
+        showToast('خطأ في الاتصال', 'danger');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-save2 me-2"></i>حفظ فاتورة الشراء';
+    }
+});
+
+function showToast(msg, type = 'info') {
+    const container = document.createElement('div');
+    container.className = `toast align-items-center text-bg-${type} border-0 show position-fixed`;
+    container.style.cssText = 'top:20px;left:50%;transform:translateX(-50%);z-index:9999;min-width:280px';
+    container.innerHTML = `<div class="d-flex"><div class="toast-body fw-semibold">${msg}</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>`;
+    document.body.appendChild(container);
+    setTimeout(() => container.remove(), 3500);
+}
+</script>
+<form id="antiforgery" method="post">@Html.AntiForgeryToken()</form>
+}

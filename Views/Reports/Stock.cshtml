@@ -1,0 +1,73 @@
+@model OilShopManagement.ViewModels.StockReportViewModel
+@{
+    ViewData["Title"] = L.T("تقرير المخزون","Stock Report");
+}
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <h4 class="fw-bold mb-0"><i class="bi bi-clipboard-data me-2 text-primary"></i>@L.T("تقرير المخزون","Stock Report")</h4>
+    <button onclick="window.print()" class="btn btn-outline-primary rounded-pill btn-sm no-print">
+        <i class="bi bi-printer me-1"></i>@L.T("طباعة","Print")
+    </button>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card p-3 text-center">
+            <div class="fs-3 fw-bold text-primary">@Model.TotalProducts</div>
+            <div class="text-muted small">@L.T("إجمالي المنتجات","Total Products")</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3 text-center @(Model.LowStockCount > 0 ? "border-warning" : "")">
+            <div class="fs-3 fw-bold text-warning">@Model.LowStockCount</div>
+            <div class="text-muted small">@L.T("مخزون منخفض","Low Stock")</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3 text-center">
+            <div class="fs-3 fw-bold text-success">@Model.TotalStockValue.ToString("N3")</div>
+            <div class="text-muted small">@L.T("قيمة المخزون (ر.ع.)","Stock Value (OMR)")</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>@L.T("المنتج","Product")</th>
+                        <th>@L.T("التصنيف","Category")</th>
+                        <th class="text-center">@L.T("الكمية","Qty")</th>
+                        <th class="text-center">@L.T("الحد الأدنى","Min")</th>
+                        <th class="text-end">@L.T("سعر الشراء","Cost")</th>
+                        <th class="text-end">@L.T("سعر البيع","Price")</th>
+                        <th class="text-end">@L.T("قيمة المخزون","Stock Value")</th>
+                        <th>@L.T("الحالة","Status")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model.Products.OrderBy(x => x.IsLowStock ? 0 : 1).ThenBy(x => x.Name))
+                    {
+                        <tr class="@(p.IsLowStock ? "table-warning" : "")">
+                            <td class="fw-semibold">@p.Name</td>
+                            <td>@p.Category?.Name</td>
+                            <td class="text-center fw-bold">@p.CurrentStock @p.Unit</td>
+                            <td class="text-center text-muted">@p.MinStockLevel</td>
+                            <td class="text-end">@p.PurchasePrice.ToString("N3")</td>
+                            <td class="text-end">@p.SalePrice.ToString("N3")</td>
+                            <td class="text-end fw-semibold">@((p.CurrentStock * p.PurchasePrice).ToString("N3"))</td>
+                            <td>
+                                @if (p.IsLowStock)
+                                { <span class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i>@L.T("منخفض","Low")</span> }
+                                else
+                                { <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>@L.T("جيد","Good")</span> }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

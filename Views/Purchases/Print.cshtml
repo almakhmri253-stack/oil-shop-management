@@ -1,0 +1,148 @@
+@model OilShopManagement.Models.Purchase
+@{
+    ViewData["Title"] = "طباعة فاتورة الشراء";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>فاتورة شراء @Model.PurchaseNumber</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css">
+    <style>
+        * { font-family: 'Cairo', sans-serif; }
+        body { background: #f0f4f8; }
+        .invoice-wrap { max-width: 800px; margin: 2rem auto; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
+        .inv-header { background: linear-gradient(135deg, #1a3a2a, #2d6a4f); color: #fff; padding: 2rem; }
+        .inv-body { padding: 2rem; }
+        .inv-footer { background: #f8f9fa; padding: 1rem 2rem; border-top: 1px solid #dee2e6; }
+        .total-row { background: linear-gradient(135deg, #198754, #52b788); color: #fff; border-radius: 8px; padding: 1rem 1.5rem; }
+        @@media print {
+            body { background: #fff !important; }
+            .invoice-wrap { box-shadow: none !important; margin: 0 !important; }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+<div class="invoice-wrap">
+    <div class="inv-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div style="width:50px;height:50px;background:rgba(255,255,255,0.2);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.5rem">
+                        🛒
+                    </div>
+                    <div>
+                        <h5 class="mb-0 fw-bold">محل تغيير وبيع زيوت السيارات</h5>
+                        <small class="opacity-75">فاتورة شراء — Purchase Invoice</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-auto text-end">
+                <div class="badge bg-light text-dark fs-6 px-3 py-2 rounded-pill">@Model.PurchaseNumber</div>
+            </div>
+        </div>
+        <div class="row g-2 mt-1" style="font-size:0.85rem;opacity:0.85">
+            <div class="col-auto"><i class="bi bi-calendar3"></i> @Model.PurchaseDate.ToString("dd/MM/yyyy HH:mm")</div>
+            <div class="col-auto"><i class="bi bi-credit-card"></i>
+                @(Model.PaymentMethod == OilShopManagement.Models.PaymentMethod.Cash ? "نقداً" :
+                  Model.PaymentMethod == OilShopManagement.Models.PaymentMethod.Card ? "بطاقة" : "تحويل")
+            </div>
+            @if (Model.Supplier != null)
+            {
+                <div class="col-auto"><i class="bi bi-truck"></i> @Model.Supplier.Name</div>
+                @if (!string.IsNullOrEmpty(Model.Supplier.Phone))
+                {
+                    <div class="col-auto"><i class="bi bi-phone"></i> @Model.Supplier.Phone</div>
+                }
+            }
+        </div>
+    </div>
+
+    <div class="inv-body">
+        <table class="table table-bordered table-sm">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>المنتج</th>
+                    <th class="text-center">الكمية</th>
+                    <th class="text-end">سعر الوحدة</th>
+                    <th class="text-end">الإجمالي</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{int row = 1;}
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td class="text-muted">@row</td>
+                        <td class="fw-semibold">@item.ProductName</td>
+                        <td class="text-center">@item.Quantity</td>
+                        <td class="text-end">@item.UnitPrice.ToString("N3")</td>
+                        <td class="text-end fw-semibold">@item.Total.ToString("N3")</td>
+                    </tr>
+                    row++;
+                }
+            </tbody>
+        </table>
+
+        <div class="row justify-content-end mt-3">
+            <div class="col-md-5">
+                <table class="table table-sm">
+                    <tr>
+                        <td class="text-muted">الإجمالي قبل الضريبة</td>
+                        <td class="text-end fw-semibold">@Model.SubTotal.ToString("N3") ر.ع.</td>
+                    </tr>
+                    @if (Model.TaxRate > 0)
+                    {
+                        <tr>
+                            <td class="text-muted">الضريبة (@Model.TaxRate%)</td>
+                            <td class="text-end fw-semibold">@Model.TaxAmount.ToString("N3") ر.ع.</td>
+                        </tr>
+                    }
+                    @if (Model.Discount > 0)
+                    {
+                        <tr>
+                            <td class="text-muted text-success">خصم</td>
+                            <td class="text-end fw-semibold text-success">- @Model.Discount.ToString("N3") ر.ع.</td>
+                        </tr>
+                    }
+                </table>
+                <div class="total-row d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">الإجمالي النهائي</span>
+                    <span class="fs-4 fw-black">@Model.TotalAmount.ToString("N3") ر.ع.</span>
+                </div>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.Notes))
+        {
+            <div class="mt-3 p-3 bg-light rounded">
+                <strong>ملاحظات:</strong> @Model.Notes
+            </div>
+        }
+    </div>
+
+    <div class="inv-footer d-flex justify-content-between align-items-center">
+        <small class="text-muted">فاتورة شراء داخلية — Internal Purchase Invoice</small>
+        <small class="text-muted">@Model.PurchaseNumber</small>
+    </div>
+</div>
+
+<div class="text-center my-3 no-print d-flex justify-content-center gap-2">
+    <button onclick="window.print()" class="btn btn-success px-4 rounded-pill">
+        <i class="bi bi-printer me-2"></i>طباعة
+    </button>
+    <a href="/Purchases/Details/@Model.Id" class="btn btn-outline-secondary rounded-pill">
+        <i class="bi bi-arrow-right me-2"></i>العودة
+    </a>
+    <a href="/Purchases/Create" class="btn btn-success rounded-pill">
+        <i class="bi bi-plus-circle me-2"></i>مشتريات جديدة
+    </a>
+</div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+</body>
+</html>

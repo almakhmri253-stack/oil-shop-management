@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Title" xml:space="preserve"><value>Sign In</value></data>
+  <data name="LoginHeading" xml:space="preserve"><value>Oil Change Shop Management System</value></data>
+  <data name="EmailLabel" xml:space="preserve"><value>Email</value></data>
+  <data name="EmailPlaceholder" xml:space="preserve"><value>Enter your email</value></data>
+  <data name="PasswordLabel" xml:space="preserve"><value>Password</value></data>
+  <data name="PasswordPlaceholder" xml:space="preserve"><value>Enter your password</value></data>
+  <data name="RememberMe" xml:space="preserve"><value>Remember me</value></data>
+  <data name="SignIn" xml:space="preserve"><value>Sign In</value></data>
+  <data name="DefaultCredentials" xml:space="preserve"><value>Default Credentials</value></data>
+  <data name="DefaultEmail" xml:space="preserve"><value>Email: admin@oilshop.com</value></data>
+  <data name="DefaultPassword" xml:space="preserve"><value>Password: Admin@123456</value></data>
+  <data name="SelectLanguage" xml:space="preserve"><value>Select Language</value></data>
+  <data name="Arabic" xml:space="preserve"><value>العربية</value></data>
+  <data name="English" xml:space="preserve"><value>English</value></data>
+</root>

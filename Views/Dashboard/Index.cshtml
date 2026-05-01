@@ -1,0 +1,200 @@
+@model OilShopManagement.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = L.T("لوحة التحكم","Dashboard");
+}
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h4 class="fw-bold mb-0">@L.T("لوحة التحكم","Dashboard")</h4>
+        <small class="text-muted">@DateTime.Now.ToString("dddd, dd MMMM yyyy  HH:mm", new System.Globalization.CultureInfo(L.IsAr ? "ar-OM" : "en-US"))</small>
+    </div>
+    <a href="/Invoices/Create" class="btn btn-primary rounded-pill px-4">
+        <i class="bi bi-plus-circle me-2"></i>@L.T("فاتورة جديدة","New Invoice")
+    </a>
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="stat-card" style="background:linear-gradient(135deg,#0d6efd,#6ea8fe);color:#fff">
+            <div class="stat-icon" style="background:rgba(255,255,255,0.2)"><i class="bi bi-receipt-cutoff"></i></div>
+            <div class="stat-value">@Model.TotalInvoicesToday</div>
+            <div class="stat-label">@L.T("فواتير اليوم","Today's Invoices")</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-card" style="background:linear-gradient(135deg,#198754,#75b798);color:#fff">
+            <div class="stat-icon" style="background:rgba(255,255,255,0.2)"><i class="bi bi-cash-stack"></i></div>
+            <div class="stat-value" style="font-size:1.3rem">@Model.SalesToday.ToString("N3")</div>
+            <div class="stat-label">@L.T("مبيعات اليوم (ر.ع.)","Today's Sales (OMR)")</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-card" style="background:linear-gradient(135deg,#ffc107,#ffda6a);color:#000">
+            <div class="stat-icon" style="background:rgba(0,0,0,0.1)"><i class="bi bi-graph-up-arrow"></i></div>
+            <div class="stat-value" style="font-size:1.3rem">@Model.ProfitToday.ToString("N3")</div>
+            <div class="stat-label">@L.T("ربح اليوم (ر.ع.)","Today's Profit (OMR)")</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-card @(Model.LowStockCount > 0 ? "border-danger" : "")" style="background:linear-gradient(135deg,#dc3545,#ea868f);color:#fff">
+            <div class="stat-icon" style="background:rgba(255,255,255,0.2)"><i class="bi bi-exclamation-triangle-fill"></i></div>
+            <div class="stat-value">@Model.LowStockCount</div>
+            <div class="stat-label">@L.T("منتجات مخزونها منخفض","Low Stock Products")</div>
+        </div>
+    </div>
+</div>
+
+<!-- Monthly Stats -->
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card p-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-primary bg-opacity-10 p-3">
+                    <i class="bi bi-calendar-month text-primary fs-4"></i>
+                </div>
+                <div>
+                    <div class="text-muted small">@L.T("مبيعات الشهر","Monthly Sales")</div>
+                    <div class="fw-bold fs-5">@Model.SalesThisMonth.ToString("N3") <small class="text-muted fw-normal fs-7">@L.T("ر.ع.","OMR")</small></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card p-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-success bg-opacity-10 p-3">
+                    <i class="bi bi-piggy-bank text-success fs-4"></i>
+                </div>
+                <div>
+                    <div class="text-muted small">@L.T("أرباح الشهر","Monthly Profit")</div>
+                    <div class="fw-bold fs-5">@Model.ProfitThisMonth.ToString("N3") <small class="text-muted fw-normal fs-7">@L.T("ر.ع.","OMR")</small></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart + Low Stock -->
+<div class="row g-3 mb-4">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-bar-chart-line me-2 text-primary"></i>@L.T("المبيعات والأرباح (آخر 7 أيام)","Sales & Profit (Last 7 Days)")
+            </div>
+            <div class="card-body">
+                <canvas id="salesChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <i class="bi bi-exclamation-triangle me-2 text-warning"></i>@L.T("مخزون منخفض","Low Stock")
+            </div>
+            <div class="card-body p-0">
+                @if (!Model.LowStockProducts.Any())
+                {
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-check-circle fs-2 text-success d-block mb-2"></i>
+                        @L.T("المخزون بمستوى جيد","Stock levels are good")
+                    </div>
+                }
+                else
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var p in Model.LowStockProducts.Take(6))
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-semibold small">@p.Name</div>
+                                    <small class="text-muted">@p.Category?.Name</small>
+                                </div>
+                                <span class="badge bg-danger rounded-pill">@p.CurrentStock @p.Unit</span>
+                            </li>
+                        }
+                    </ul>
+                    @if (Model.LowStockProducts.Count() > 6)
+                    {
+                        <div class="p-2 text-center">
+                            <a href="/Products?lowStock=true" class="btn btn-sm btn-outline-danger">@L.T("عرض الكل","View All")</a>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Invoices -->
+<div class="card">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <span><i class="bi bi-clock-history me-2 text-primary"></i>@L.T("آخر الفواتير","Recent Invoices")</span>
+        <a href="/Invoices" class="btn btn-sm btn-outline-primary rounded-pill">@L.T("عرض الكل","View All")</a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>@L.T("رقم الفاتورة","Invoice #")</th>
+                        <th>@L.T("العميل","Customer")</th>
+                        <th>@L.T("التاريخ","Date")</th>
+                        <th>@L.T("الإجمالي","Total")</th>
+                        <th>@L.T("الحالة","Status")</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var inv in Model.RecentInvoices.Take(8))
+                    {
+                        <tr>
+                            <td><span class="badge bg-primary-subtle text-primary">@inv.InvoiceNumber</span></td>
+                            <td>@(inv.Customer?.Name ?? L.T("عميل عام","Walk-in"))</td>
+                            <td>@inv.InvoiceDate.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="fw-semibold">@inv.TotalAmount.ToString("N3") @L.T("ر.ع.","OMR")</td>
+                            <td>
+                                @if (inv.Status == OilShopManagement.Models.InvoiceStatus.Completed)
+                                { <span class="badge bg-success">@L.T("مكتملة","Completed")</span> }
+                                else if (inv.Status == OilShopManagement.Models.InvoiceStatus.Cancelled)
+                                { <span class="badge bg-danger">@L.T("ملغاة","Cancelled")</span> }
+                                else
+                                { <span class="badge bg-secondary">@L.T("مسودة","Draft")</span> }
+                            </td>
+                            <td>
+                                <a href="/Invoices/Details/@inv.Id" class="btn btn-sm btn-outline-secondary rounded-pill">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.RecentInvoices.Any())
+                    {
+                        <tr><td colspan="6" class="text-center text-muted py-4">@L.T("لا توجد فواتير","No invoices")</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+const labels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ChartLabels));
+const salesData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ChartSalesData));
+const profitData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ChartProfitData));
+const ctx = document.getElementById('salesChart').getContext('2d');
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels,
+        datasets: [
+            { label: '@L.T("المبيعات","Sales")', data: salesData, backgroundColor: 'rgba(13,110,253,0.7)', borderRadius: 6 },
+            { label: '@L.T("الأرباح","Profit")', data: profitData, backgroundColor: 'rgba(25,135,84,0.7)', borderRadius: 6,
+              type: 'line', borderColor: 'rgba(25,135,84,1)', fill: false, tension: 0.4 }
+        ]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true } } }
+});
+</script>
+}
