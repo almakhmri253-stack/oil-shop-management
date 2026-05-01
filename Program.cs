@@ -39,7 +39,9 @@ try
                   ?? throw new InvalidOperationException("No connection string found.");
     }
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseNpgsql(connStr));
+        options.UseNpgsql(connStr)
+               .ConfigureWarnings(w => w.Ignore(
+                   Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
 
     // Identity
     builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
