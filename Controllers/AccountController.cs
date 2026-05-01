@@ -38,11 +38,17 @@ public class AccountController : Controller
         var user = await _userManager.FindByEmailAsync(model.Email);
         if (user == null || !user.IsActive)
         {
-            ModelState.AddModelError("", "ط§ظ„ط¨ط±ظٹط¯ ط§ظ„ط¥ظ„ظƒطھط±ظˆظ†ظٹ ط£ظˆ ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ط؛ظٹط± طµط­ظٹط­ط©");
+            ModelState.AddModelError("", "البريد الإلكتروني أو كلمة المرور غير صحيحة");
             return View(model);
         }
 
-        var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false);
+        if (await _userManager.IsLockedOutAsync(user))
+        {
+            ModelState.AddModelError("", "تم تعطيل الحساب مؤقتاً بسبب محاولات دخول متكررة. حاول بعد 15 دقيقة.");
+            return View(model);
+        }
+
+        var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, lockoutOnFailure: true);
         if (result.Succeeded)
         {
             user.LastLoginAt = DateTime.UtcNow;
@@ -52,7 +58,12 @@ public class AccountController : Controller
                 return Redirect(returnUrl);
             return RedirectToAction("Index", "Dashboard");
         }
-        ModelState.AddModelError("", "ط§ظ„ط¨ط±ظٹط¯ ط§ظ„ط¥ظ„ظƒطھط±ظˆظ†ظٹ ط£ظˆ ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ط؛ظٹط± طµط­ظٹط­ط©");
+        if (result.IsLockedOut)
+        {
+            ModelState.AddModelError("", "تم تعطيل الحساب مؤقتاً بسبب محاولات دخول متكررة. حاول بعد 15 دقيقة.");
+            return View(model);
+        }
+        ModelState.AddModelError("", "البريد الإلكتروني أو كلمة المرور غير صحيحة");
         return View(model);
     }
 
@@ -78,17 +89,17 @@ public class AccountController : Controller
 
 public class LoginViewModel
 {
-    [Required(ErrorMessage = "ط§ظ„ط¨ط±ظٹط¯ ط§ظ„ط¥ظ„ظƒطھط±ظˆظ†ظٹ ظ…ط·ظ„ظˆط¨")]
+    [Required(ErrorMessage = "البريد الإلكتروني مطلوب")]
     [EmailAddress]
-    [Display(Name = "ط§ظ„ط¨ط±ظٹط¯ ط§ظ„ط¥ظ„ظƒطھط±ظˆظ†ظٹ")]
+    [Display(Name = "البريد الإلكتروني")]
     public string Email { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط± ظ…ط·ظ„ظˆط¨ط©")]
+    [Required(ErrorMessage = "كلمة المرور مطلوبة")]
     [DataType(DataType.Password)]
-    [Display(Name = "ظƒظ„ظ…ط© ط§ظ„ظ…ط±ظˆط±")]
+    [Display(Name = "كلمة المرور")]
     public string Password { get; set; } = string.Empty;
 
-    [Display(Name = "طھط°ظƒط±ظ†ظٹ")]
+    [Display(Name = "تذكرني")]
     public bool RememberMe { get; set; }
 }
 

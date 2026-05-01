@@ -46,11 +46,15 @@ try
     // Identity
     builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     {
-        options.Password.RequiredLength = 6;
-        options.Password.RequireNonAlphanumeric = false;
-        options.Password.RequireUppercase = false;
-        options.Password.RequireLowercase = false;
+        options.Password.RequiredLength = 8;
+        options.Password.RequireNonAlphanumeric = true;
+        options.Password.RequireUppercase = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireDigit = true;
         options.SignIn.RequireConfirmedAccount = false;
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+        options.Lockout.MaxFailedAccessAttempts = 5;
+        options.Lockout.AllowedForNewUsers = true;
     })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
@@ -113,6 +117,17 @@ try
         app.UseExceptionHandler("/Home/Error");
         app.UseHsts();
     }
+
+    app.Use(async (context, next) =>
+    {
+        context.Response.Headers["X-Frame-Options"] = "DENY";
+        context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+        context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
+        context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+        context.Response.Headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()";
+        await next();
+    });
+
     app.UseStaticFiles();
     app.UseRouting();
     app.UseRequestLocalization();
